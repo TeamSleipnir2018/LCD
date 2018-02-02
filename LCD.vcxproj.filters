@@ -17,4 +17,9 @@
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="__vm\.LCD.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
