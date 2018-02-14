@@ -48,9 +48,19 @@ uint8_t prevGear;
 char gearDisp;
 
 uint8_t speed;
+uint8_t prevSpeed;
 char speedDisp[2];
+uint8_t speedCount;
 
-// Logo byte array 432x64px
+bool fanOn;
+bool prevFanOn;
+
+// Speedometer vector
+int cX;
+int cY;
+uint16_t speedoRadius;
+
+// Logo byte array 464x64px XBM
 const static uint8_t logo[] PROGMEM = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -366,7 +376,7 @@ const static uint8_t logo[] PROGMEM = {
 
 const static char celcius[2] = { 0xb0, 0x43 };
 
-// Fan icon 25x25px
+// Fan icon 25x25px XBM
 const static uint8_t fanIcon[] PROGMEM = {
 	0x80, 0x07, 0x00, 0x00, 0xe0, 0x0f, 0x00, 0x00, 0xf0, 0x0f, 0x0c, 0x00,
 	0xf8, 0x0f, 0x3f, 0x00, 0xf8, 0x8f, 0x7f, 0x00, 0xfc, 0xcf, 0xff, 0x00,
@@ -382,17 +392,28 @@ const static uint8_t fanIcon[] PROGMEM = {
 void demo() {
 	if (rpm != 6000) {
 		rpm += 25;
-		if (gear < 6) {
-			speed += 1;
-		}
 	}
 	else {
 		oilTemp = random(110, 150);
 		waterTemp = random(110, 150);
 		brakeTemp = random(110, 150);
-		rpm = 2000;
+		
 		if (gear < 6) {
 			gear++;
+			rpm = 2000;
+		}
+		else {
+			rpm = 5500;
+		}
+	}
+
+	if (speed < 255 && gear != 0) {
+		if (speedCount == 3) {
+			speed++;
+			speedCount = 0;
+		}
+		else {
+			speedCount++;
 		}
 	}
 }
@@ -438,6 +459,11 @@ void printValues() {
 	if (prevRPM != rpm) {
 		printValue(170, 200, rpm, prevRPM, rpmDisp, 2);
 	}
+	if (prevSpeed != speed) {
+		drawSpeedLine(prevSpeed, 0x0000);
+		drawSpeedLine(speed, RA8875_RED);
+		prevSpeed = speed;
+	}
 	if (prevGear != gear) {
 		if (gear == 0) {
 			tft.drawChar(200, 100, 'N', 0xffff, 0x0000, 10);
@@ -449,6 +475,18 @@ void printValues() {
 			tft.drawChar(200, 100, gearDisp, 0xffff, 0x0000, 10);
 		}
 	}
+}
+
+void drawFanDisabled() {
+	tft.drawCircle(238, 23, 20, RA8875_RED);
+	tft.drawLine(225, 10, 251, 36, RA8875_RED);
+}
+
+void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
+	int speedToDeg = 315 - value;
+	int u = (speedoRadius * sin(speedToDeg * (PI / 180))) + cX;
+	int v = (speedoRadius * cos(speedToDeg * (PI / 180))) + cY;
+	tft.drawLine(cX, cY, u, v, color);
 }
 
 void setup() {
@@ -495,12 +533,21 @@ void setup() {
 	gear = 0;
 	prevGear = 255;
 	speed = 0;
+	prevSpeed = 255;
+	fanOn = false;
+	prevFanOn = true;
+
+	// Initialize speedometer values
+	cX = 370;
+	cY = 110;
+	speedoRadius = 70;
+	speedCount = 0;
 
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
 	// Draw the icon for cooling fan
-	tft.drawXBitmap(200, 10, fanIcon, 25, 25, 0xffff);
-
+	tft.drawXBitmap(225, 10, fanIcon, 25, 25, 0xffff);
+	drawFanDisabled();
 	tft.textMode();
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	printLabels();
@@ -518,13 +565,26 @@ void loop() {
 	if (digitalRead(RA8875_INT)) {
 		if (tft.touched()) {
 			// Idea: Discard a warning message after abnormal values are read
-			
 			Serial.print("Touch: ");
-			//tft.invertDisplay(invert);
+			Serial.println(fanOn);
 			tft.touchRead(&tx, &ty);
-			Serial.print(tx); Serial.print(", "); Serial.println(ty);
-			// Draw a circle
-			tft.fillCircle((uint16_t)(tx / xScale), (uint16_t)(ty / yScale), 4, RA8875_WHITE);
+
+			if ((uint16_t)(tx / xScale) >= 220 && (uint16_t)(tx / xScale) <= 255 && (uint16_t)(ty / yScale) >= 0 && (uint16_t)(ty / yScale) <= 40) {
+				if (prevFanOn != fanOn) {
+					prevFanOn = fanOn;
+					if (fanOn) {
+						drawFanDisabled();
+						fanOn = false;
+					}
+					else {
+						tft.graphicsMode();
+						tft.fillRect(215, 0, 50, 50, 0x0000);
+						tft.drawXBitmap(225, 10, fanIcon, 25, 25, 0xffff);
+						tft.textMode();
+						fanOn = true;
+					}
+				}
+			}
 		}
 	}
 }
