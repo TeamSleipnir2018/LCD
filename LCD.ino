@@ -2,7 +2,7 @@
 Team Sleipnir steering wheel LCD
 
 Hardware:
-	- Arduino Pro Mini
+	- Teensy 3.2 (Previously Arduino Pro Mini)
 	- Adafruit RA8875 touch LCD controller
 	- 480 x 272 touch LCD
 	- NPIC6C4894 shift registers
@@ -10,22 +10,35 @@ Hardware:
 Written by Einar Arnason
 ******************************************************************/
 
+#include <kinetis_flexcan.h>
+#include <FlexCAN.h>
+#include <Metro.h>
 #include <SPI.h>
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_RA8875.h>
-#include <CAN.h>
 
-// Library only supports hardware SPI at this time
-// Connect SCLK to UNO Digital #13 (Hardware SPI clock)
-// Connect MISO to UNO Digital #12 (Hardware SPI MISO)
-// Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
-const uint8_t RA8875_INT = 6;
+// Pin assignment
+// LCD
+const uint8_t RA8875_INT = 2;
 const uint8_t RA8875_CS = 10;
 const uint8_t RA8875_RESET = 9;
+// Shift register
+const uint8_t SR_CLOCK_OUT = 16;
+const uint8_t SR_DATA_OUT = 15;
+const uint8_t SR_LATCH = 14;
 
+// LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
+
+// CAN BUS driver, takes in baud rate
+FlexCAN CANbus(0);
+Metro sysTimer = Metro(1);// milliseconds
+static CAN_message_t msg, rxmsg;
+//static uint8_t hex[17] = "0123456789abcdef";
+int txCount, rxCount;
+unsigned int txTimer, rxTimer;
 
 // Vehicle values
 const uint16_t MAX_RPM = 14000;
@@ -59,9 +72,6 @@ bool fanOn;
 bool prevFanOn;
 
 // Shift register values
-const uint8_t SR_CLOCK_OUT = 9;
-const uint8_t SR_DATA_OUT = 4;
-const uint8_t SR_LATCH = 2;
 const uint8_t WARNING_LIGHT1 = 128;
 const uint8_t WARNING_LIGHT2 = 64;
 const uint8_t WARNING_LIGHT3 = 32;
@@ -400,7 +410,8 @@ const static uint8_t logo[] PROGMEM = {
 	0x00, 0x00, 0x00, 0x00
 };
 
-const static char celcius[2] = { 0xb0, 0x43 };
+// Celcius symbol for arduino
+const static char celcius[3] = { 0xb0, 0x43 };
 
 // Fan icon 25x25px XBM
 const static uint8_t fanIcon[] PROGMEM = {
@@ -446,18 +457,18 @@ void demo() {
 
 void printLabels() {
 	tft.textSetCursor(10, 10);
-	tft.textEnlarge(1);
+	tft.textEnlarge(3);
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	tft.textWrite("OIL: ");
-	tft.textSetCursor(10, 95);
+	tft.textSetCursor(10, 160);
 	tft.textWrite("WATER: ");
-	tft.textSetCursor(10, 180);
+	tft.textSetCursor(10, 300);
 	tft.textWrite("BRAKES: ");
 	//tft.drawCircle(370, 110, 80, 0xffff);
-	tft.textSetCursor(400, 140);
+	tft.textSetCursor(620, 240);
 	tft.textWrite("km/h");
-	tft.textSetCursor(270, 200);
-	tft.textEnlarge(2);
+	tft.textSetCursor(500, 400);
+	tft.textEnlarge(3);
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	tft.textWrite(" RPM");
 }
@@ -487,28 +498,28 @@ void printValues() {
 	if (tempTimer == 255) {
 		if (prevOilTemp != oilTemp) {
 			if (oilTemp > 250) {
-				printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1, true);
+				printValue(10, 80, oilTemp, prevOilTemp, oilTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1, false);
+				printValue(10, 80, oilTemp, prevOilTemp, oilTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevWaterTemp != waterTemp) {
 			if (waterTemp > 250) {
-				printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1, true);
+				printValue(10, 230, waterTemp, prevWaterTemp, waterTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1, false);
+				printValue(10, 230, waterTemp, prevWaterTemp, waterTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevBrakeTemp != brakeTemp) {
 			if (brakeTemp > 250) {
-				printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1, true);
+				printValue(10, 380, brakeTemp, prevBrakeTemp, brakeTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1, false);
+				printValue(10, 380, brakeTemp, prevBrakeTemp, brakeTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
@@ -519,10 +530,10 @@ void printValues() {
 	}
 	if (prevRPM != rpm) {
 		if (rpm > MAX_RPM - 500) {
-			printValue(160, 200, rpm, prevRPM, rpmDisp, 2, true);
+			printValue(340, 400, rpm, prevRPM, rpmDisp, 3, true);
 		}
 		else {
-			printValue(160, 200, rpm, prevRPM, rpmDisp, 2, false);
+			printValue(340, 400, rpm, prevRPM, rpmDisp, 3, false);
 		}
 	}
 	if (prevSpeed != speed) {
@@ -530,47 +541,47 @@ void printValues() {
 		//drawSpeedLine(prevSpeed, 0x0000);
 		//drawSpeedLine(speed, RA8875_RED);
 		
-		printValue(320, 130, speed, prevSpeed, speedDisp, 2, false);
+		printValue(520, 230, speed, prevSpeed, speedDisp, 3, false);
 		switch (speed) {
 		case 28 :
-			tft.fillRect(300, 110, 18, 30, 0xffff);
+			tft.fillRect(500, 210, 18, 30, 0xffff);
 			break;
 		case 56 :
-			tft.fillRect(320, 100, 18, 35, 0xf877);
+			tft.fillRect(520, 200, 18, 35, 0xf877);
 			break;
 		case 84 :
-			tft.fillRect(340, 90, 18, 40, 0xf866);
+			tft.fillRect(540, 190, 18, 40, 0xf866);
 			break;
 		case 112 :
-			tft.fillRect(360, 80, 18, 45, 0xf855);
+			tft.fillRect(560, 180, 18, 45, 0xf855);
 			break;
 		case 140 :
-			tft.fillRect(380, 70, 18, 50, 0xf844);
+			tft.fillRect(580, 170, 18, 50, 0xf844);
 			break;
 		case 168 :
-			tft.fillRect(400, 65, 18, 55, 0xf833);
+			tft.fillRect(600, 165, 18, 55, 0xf833);
 			break;
 		case 196 :
-			tft.fillRect(420, 60, 18, 60, 0xf822);
+			tft.fillRect(620, 160, 18, 60, 0xf822);
 			break;
 		case 224 :
-			tft.fillRect(440, 55, 18, 65, 0xf811);
+			tft.fillRect(640, 155, 18, 65, 0xf811);
 			break;
 		case 252 :
-			tft.fillRect(460, 50, 18, 70, 0xf800);
+			tft.fillRect(660, 150, 18, 70, 0xf800);
 			break;
 		}
 		//prevSpeed = speed;
 	}
 	if (prevGear != gear) {
 		if (gear == 0) {
-			tft.drawChar(200, 100, 'N', 0xffff, 0x0000, 10);
+			tft.drawChar(380, 220, 'N', 0xffff, 0x0000, 10);
 			prevGear = gear;
 		}
 		else {
 			gearDisp = 48 + gear;
 			prevGear = gear;
-			tft.drawChar(200, 100, gearDisp, 0xffff, 0x0000, 10);
+			tft.drawChar(380, 220, gearDisp, 0xffff, 0x0000, 10);
 		}
 	}
 }
@@ -608,12 +619,72 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, HIGH);
 }
 
+void listenOnCAN() {
+	// service software timers based on Metro tick
+	if (sysTimer.check()) {
+		if (txTimer) {
+			--txTimer;
+		}
+		if (rxTimer) {
+			--rxTimer;
+		}
+	}
+
+	// if not time-delayed, read CAN messages and print 1st byte
+	if (!rxTimer) {
+		while (CANbus.read(rxmsg)) {
+			//hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
+			Serial.write(rxmsg.buf[0]);
+			rxCount++;
+		}
+	}
+
+	// insert a time delay between transmissions
+	if (!txTimer) {
+		// if frames were received, print the count
+		if (rxCount) {
+			Serial.write('=');
+			Serial.print(rxCount);
+			rxCount = 0;
+		}
+		txTimer = 100;//milliseconds
+		msg.len = 8;
+		msg.id = 0x222;
+		for (int idx = 0; idx<8; ++idx) {
+			msg.buf[idx] = '0' + idx;
+		}
+		// send 6 at a time to force tx buffering
+		txCount = 6;
+		Serial.println(".");
+		while (txCount--) {
+			CANbus.write(msg);
+			msg.buf[0]++;
+		}
+		// time delay to force some rx data queue use
+		rxTimer = 3;//milliseconds
+	}
+}
+
+/*
+// Example code, might not need it
+static void hexDump(uint8_t dumpLen, uint8_t *bytePtr) {
+	uint8_t working;
+	while (dumpLen--) {
+		working = *bytePtr++;
+		Serial.write(hex[working >> 4]);
+		Serial.write(hex[working & 15]);
+	}
+	Serial.write('\r');
+	Serial.write('\n');
+}
+*/
+
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
 
 	// Initialize the CAN bus
-	CAN.begin(500E3);
+	CANbus.begin();
 
 	// Enable shiftregister output
 	pinMode(SR_CLOCK_OUT, OUTPUT);
@@ -621,10 +692,11 @@ void setup() {
 	pinMode(SR_LATCH, OUTPUT);
 
 	// Initialise the display using 'RA8875_480x272'
-	if (!tft.begin(RA8875_480x272)) {
+	if (!tft.begin(RA8875_800x480)) {
 		Serial.println("RA8875 Not Found!");
 		while (1);
 	}
+	digitalWrite(RA8875_CS, LOW);
 
 	Serial.println("Found RA8875");
 
@@ -682,6 +754,8 @@ void setup() {
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	printLabels();
 	printValues();
+
+	sysTimer.reset();
 }
 
 void loop() {
