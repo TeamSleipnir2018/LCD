@@ -5,4 +5,3 @@ Steering wheel LCD controller
 [https://github.com/adafruit/Adafruit_RA8875](https://github.com/adafruit/Adafruit_RA8875)
 
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
-
