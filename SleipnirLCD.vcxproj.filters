@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="__vm\.SleipnirLCD.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -33,5 +34,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
 >>>>>>> 5122bbd... Added initial code
+=======
+    <ClInclude Include="__vm\.SleipnirLCD.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="__vm\.LCD.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LCD.ino" />
+>>>>>>> 018fc55... Fixed char overflow after IDE update
   </ItemGroup>
 </Project>
