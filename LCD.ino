@@ -50,10 +50,10 @@ uint8_t gear;
 uint8_t prevGear;
 char gearDisp;
 
-uint8_t speed;
-uint8_t prevSpeed;
-char speedDisp[2];
-uint8_t speedCount;
+uint16_t speed;
+uint16_t prevSpeed;
+char speedDisp[3];
+uint16_t speedCount;
 
 bool fanOn;
 bool prevFanOn;
@@ -453,7 +453,9 @@ void printLabels() {
 	tft.textWrite("WATER: ");
 	tft.textSetCursor(10, 180);
 	tft.textWrite("BRAKES: ");
-	tft.drawCircle(370, 110, 80, 0xffff);
+	//tft.drawCircle(370, 110, 80, 0xffff);
+	tft.textSetCursor(400, 140);
+	tft.textWrite("km/h");
 	tft.textSetCursor(270, 200);
 	tft.textEnlarge(2);
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
@@ -524,9 +526,41 @@ void printValues() {
 		}
 	}
 	if (prevSpeed != speed) {
-		drawSpeedLine(prevSpeed, 0x0000);
-		drawSpeedLine(speed, RA8875_RED);
-		prevSpeed = speed;
+		
+		//drawSpeedLine(prevSpeed, 0x0000);
+		//drawSpeedLine(speed, RA8875_RED);
+		
+		printValue(320, 130, speed, prevSpeed, speedDisp, 2, false);
+		switch (speed) {
+		case 28 :
+			tft.fillRect(300, 110, 18, 30, 0xffff);
+			break;
+		case 56 :
+			tft.fillRect(320, 100, 18, 35, 0xf877);
+			break;
+		case 84 :
+			tft.fillRect(340, 90, 18, 40, 0xf866);
+			break;
+		case 112 :
+			tft.fillRect(360, 80, 18, 45, 0xf855);
+			break;
+		case 140 :
+			tft.fillRect(380, 70, 18, 50, 0xf844);
+			break;
+		case 168 :
+			tft.fillRect(400, 65, 18, 55, 0xf833);
+			break;
+		case 196 :
+			tft.fillRect(420, 60, 18, 60, 0xf822);
+			break;
+		case 224 :
+			tft.fillRect(440, 55, 18, 65, 0xf811);
+			break;
+		case 252 :
+			tft.fillRect(460, 50, 18, 70, 0xf800);
+			break;
+		}
+		//prevSpeed = speed;
 	}
 	if (prevGear != gear) {
 		if (gear == 0) {
