@@ -18,7 +18,7 @@ Written by Einar Arnason
 // Connect SCLK to UNO Digital #13 (Hardware SPI clock)
 // Connect MISO to UNO Digital #12 (Hardware SPI MISO)
 // Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
-#define RA8875_INT 4
+#define RA8875_INT 6
 #define RA8875_CS 10
 #define RA8875_RESET 9
 #define LOGO_SIZE 9391
@@ -54,6 +54,12 @@ uint8_t speedCount;
 
 bool fanOn;
 bool prevFanOn;
+
+// Shift register values
+#define sClockOut 9
+#define sDataOut 4
+#define sLatch 2
+
 
 // Speedometer vector
 int cX;
@@ -405,6 +411,31 @@ void demo() {
 		else {
 			rpm = 5500;
 		}
+
+		digitalWrite(sLatch, LOW);
+
+		if (sClockOut) {
+			digitalWrite(sDataOut, !digitalRead(sDataOut));
+		}
+		/*
+		int counter = 0;
+		while (counter < 11) {
+		if (sClockOut) {
+		digitalWrite(sDataOut, LOW);
+		counter++;
+		Serial.println("Clock");
+		}
+		}
+		counter = 0;
+		while (counter < 11) {
+		if (sClockOut) {
+		digitalWrite(sDataOut, HIGH);
+		counter++;
+		Serial.println("Clock");
+		}
+		}
+		*/
+		digitalWrite(sLatch, HIGH);
 	}
 
 	if (speed < 255 && gear != 0) {
@@ -493,6 +524,12 @@ void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
 
+	// Enable shiftregister clock
+	pinMode(sClockOut, OUTPUT);
+	TCCR1A = bit(COM1A0);
+	TCCR1B = bit(WGM12) | bit(CS10);
+	OCR1A = 0;
+
 	// Initialise the display using 'RA8875_480x272'
 	if (!tft.begin(RA8875_480x272)) {
 		Serial.println("RA8875 Not Found!");
@@ -555,6 +592,8 @@ void setup() {
 }
 
 void loop() {
+	
+
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
 
@@ -564,12 +603,11 @@ void loop() {
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
 		if (tft.touched()) {
-			// Idea: Discard a warning message after abnormal values are read
-			Serial.print("Touch: ");
-			Serial.println(fanOn);
 			tft.touchRead(&tx, &ty);
+			uint16_t touchX = (uint16_t)(tx / xScale);
+			uint16_t touchY = (uint16_t)(ty / yScale);
 
-			if ((uint16_t)(tx / xScale) >= 220 && (uint16_t)(tx / xScale) <= 255 && (uint16_t)(ty / yScale) >= 0 && (uint16_t)(ty / yScale) <= 40) {
+			if (touchX >= 220 && touchX <= 255 && touchY >= 0 && touchY <= 40) {
 				if (prevFanOn != fanOn) {
 					prevFanOn = fanOn;
 					if (fanOn) {
