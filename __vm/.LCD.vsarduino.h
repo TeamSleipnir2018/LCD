@@ -62,10 +62,10 @@ typedef void *__builtin_va_list;
 
 
 
-#include <Arduino.h>
+#include <arduino.h>
 #include <pins_arduino.h> 
-#undef F
-#define F(string_literal) ((const PROGMEM char *)(string_literal))
+//#undef F
+//#define F(string_literal) ((const PROGMEM char *)(string_literal))
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
 
@@ -76,6 +76,6 @@ typedef void *__builtin_va_list;
 #define pgm_read_float(address_short) float()
 #define pgm_read_ptr(address_short)   short()
 
-#include "SleipnirLCD.ino"
+#include "LCD.ino"
 #endif
 #endif

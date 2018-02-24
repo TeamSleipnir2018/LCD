@@ -10,6 +10,7 @@ Written by Einar Arnason
 ******************************************************************/
 
 #include <SPI.h>
+#include <stdint.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_RA8875.h"
 #include <Fonts/FreeSansBold24pt7b.h>
@@ -28,12 +29,12 @@ uint16_t tx, ty;
 // Vehicle values
 uint16_t rpm;
 uint16_t prevRPM;
-char rpmDisp[4];
+char rpmDisp[5];
 uint16_t oilTemp;
 uint16_t prevOilTemp;
-char oilTempDisp[4];
+char oilTempDisp[5];
 uint8_t gear;
-uint16_t prevGear;
+uint8_t prevGear;
 char gearDisp[2];
 
 // Logo byte array
@@ -303,7 +304,7 @@ void setup() {
 
 void demo() {
 	if (rpm != 6000) {
-		rpm += 25;
+		rpm += 1;
 	}
 	else {
 		rpm = 2000;
@@ -328,21 +329,30 @@ void printValues() {
 		sprintf(oilTempDisp, "%d", oilTemp);
 		prevOilTemp = oilTemp;
 		tft.textSetCursor(100, 10);
-		tft.textEnlarge(1);
+		tft.textEnlarge(2);
 		tft.textWrite(oilTempDisp);
 	}
 	if (prevGear != gear) {
 		sprintf(gearDisp, "%d", gear);
 		prevGear = gear;
+		
+		tft.graphicsMode();
+		tft.setFont(&FreeSansBold24pt7b);
+		tft.setTextColor(RA8875_WHITE);
+		tft.setCursor(200, 100);
+		tft.print(gearDisp);
+		tft.textMode();
+		/*
 		tft.textSetCursor(200, 100);
 		tft.textEnlarge(3);
 		tft.textWrite(gearDisp);
-	}
+		*/
+	}/*
 	else if (gear == 0) {
 		tft.textSetCursor(200, 100);
 		tft.textEnlarge(3);
 		tft.textWrite("N");
-	}
+	}*/
 	if (prevRPM != rpm) {
 		sprintf(rpmDisp, "%d", rpm);
 		prevRPM = rpm;

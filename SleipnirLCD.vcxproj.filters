@@ -15,11 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SleipnirLCD.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.SleipnirLCD.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="__vm\.LCD.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LCD.ino" />
   </ItemGroup>
 </Project>
