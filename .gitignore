@@ -287,15 +287,9 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-<<<<<<< HEAD
 # Visual Micro
 __vm/
 Debug/
 
-# vscode
-.vscode/
-=======
 # vscode arduino extension
-__vm/
 .vscode/
->>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
