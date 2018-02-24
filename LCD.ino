@@ -68,10 +68,17 @@ uint8_t gear;
 uint8_t prevGear;
 char gearDisp;
 
+<<<<<<< HEAD
 uint8_t speed;
 uint8_t prevSpeed;
 char speedDisp[2];
 uint8_t speedCount;
+=======
+uint16_t speed;
+uint16_t prevSpeed;
+char speedDisp[3];
+uint16_t speedCount;
+>>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
 
 bool fanOn;
 bool prevFanOn;
