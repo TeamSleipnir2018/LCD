@@ -11,17 +11,17 @@ Written by Einar Arnason
 
 #include <SPI.h>
 #include <stdint.h>
-#include "Adafruit_GFX.h"
-#include "Adafruit_RA8875.h"
-#include <Fonts/FreeSansBold24pt7b.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_RA8875.h>
 
 // Library only supports hardware SPI at this time
 // Connect SCLK to UNO Digital #13 (Hardware SPI clock)
 // Connect MISO to UNO Digital #12 (Hardware SPI MISO)
 // Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
-#define RA8875_INT 3
+#define RA8875_INT 4
 #define RA8875_CS 10
 #define RA8875_RESET 9
+#define LOGO_SIZE 9391
 
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
@@ -30,12 +30,17 @@ uint16_t tx, ty;
 uint16_t rpm;
 uint16_t prevRPM;
 char rpmDisp[5];
+
 uint16_t oilTemp;
 uint16_t prevOilTemp;
 char oilTempDisp[5];
+
 uint8_t gear;
 uint8_t prevGear;
-char gearDisp[2];
+char gearDisp;
+
+uint8_t speed;
+char speedDisp[2];
 
 // Logo byte array
 const static uint8_t logo[] PROGMEM = {
@@ -257,6 +262,64 @@ const static uint8_t logo[] PROGMEM = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+void demo() {
+	if (rpm != 6000) {
+		rpm += 25;
+		if (gear < 6) {
+			speed += 1;
+		}
+	}
+	else {
+		oilTemp = random(110, 150);
+		rpm = 2000;
+		if (gear < 6) {
+			gear++;
+		}
+	}
+}
+
+void printLabels() {
+	tft.textSetCursor(10, 10);
+	tft.textEnlarge(1);
+	tft.textColor(RA8875_WHITE, RA8875_BLACK);
+	tft.textWrite("Temp: ");
+	tft.drawCircle(370, 110, 80, 0xffff);
+	tft.textSetCursor(270, 200);
+	tft.textEnlarge(2);
+	tft.textColor(RA8875_WHITE, RA8875_BLACK);
+	tft.textWrite(" RPM");
+}
+
+void printValues() {
+	if (prevOilTemp != oilTemp) {
+		sprintf(oilTempDisp, "%d", oilTemp);
+		prevOilTemp = oilTemp;
+		tft.textSetCursor(100, 10);
+		tft.textEnlarge(2);
+		tft.textColor(RA8875_WHITE, RA8875_BLACK);
+		tft.textWrite(oilTempDisp);
+	}
+	if (prevGear != gear) {
+		if (gear == 0) {
+			tft.drawChar(200, 100, 'N', 0xffff, 0x0000, 10);
+			prevGear = gear;
+		}
+		else {
+			gearDisp = 48 + gear;
+			prevGear = gear;
+			tft.drawChar(200, 100, gearDisp, 0xffff, 0x0000, 10);
+		}
+	}
+	if (prevRPM != rpm) {
+		sprintf(rpmDisp, "%d", rpm);
+		prevRPM = rpm;
+		tft.textSetCursor(170, 200);
+		tft.textEnlarge(2);
+		tft.textColor(RA8875_WHITE, RA8875_BLACK);
+		tft.textWrite(rpmDisp);
+	}
+}
+
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
@@ -274,7 +337,7 @@ void setup() {
 	tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
 	tft.PWM1out(0); // Start faded out
 	
-	// display logo
+	//Draw logo
 	tft.graphicsMode();
 	tft.drawBitmap(24, 104, logo, 432, 64, RA8875_RED);
 	
@@ -283,6 +346,7 @@ void setup() {
 		tft.PWM1out(i);
 		delay(10);
 	}
+	delay(2000);
 
 	pinMode(RA8875_INT, INPUT);
 	digitalWrite(RA8875_INT, HIGH);
@@ -290,11 +354,9 @@ void setup() {
 	rpm = 0;
 	oilTemp = 100;
 	gear = 0;
+	prevGear = 255;
+	speed = 0;
 
-	//Serial.print("Status: "); Serial.println(tft.readStatus(), HEX);
-	//Serial.println("Waiting for touch events ...");
-
-	delay(3000);
 	tft.fillScreen(RA8875_BLACK);
 	tft.textMode();
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
@@ -302,77 +364,24 @@ void setup() {
 	printValues();
 }
 
-void demo() {
-	if (rpm != 6000) {
-		rpm += 1;
-	}
-	else {
-		rpm = 2000;
-		if (gear < 6) {
-			gear++;
-			oilTemp++;
-		}
-	}	
-}
-
-void printLabels() {
-	tft.textSetCursor(10, 10);
-	tft.textEnlarge(1);
-	tft.textWrite("Temp: ");
-	tft.textSetCursor(270, 200);
-	tft.textEnlarge(2);
-	tft.textWrite(" RPM");
-}
-
-void printValues() {
-	if (prevOilTemp != oilTemp) {
-		sprintf(oilTempDisp, "%d", oilTemp);
-		prevOilTemp = oilTemp;
-		tft.textSetCursor(100, 10);
-		tft.textEnlarge(2);
-		tft.textWrite(oilTempDisp);
-	}
-	if (prevGear != gear) {
-		sprintf(gearDisp, "%d", gear);
-		prevGear = gear;
-		
-		tft.graphicsMode();
-		tft.setFont(&FreeSansBold24pt7b);
-		tft.setTextColor(RA8875_WHITE);
-		tft.setCursor(200, 100);
-		tft.print(gearDisp);
-		tft.textMode();
-		/*
-		tft.textSetCursor(200, 100);
-		tft.textEnlarge(3);
-		tft.textWrite(gearDisp);
-		*/
-	}/*
-	else if (gear == 0) {
-		tft.textSetCursor(200, 100);
-		tft.textEnlarge(3);
-		tft.textWrite("N");
-	}*/
-	if (prevRPM != rpm) {
-		sprintf(rpmDisp, "%d", rpm);
-		prevRPM = rpm;
-		tft.textSetCursor(170, 200);
-		tft.textEnlarge(2);
-		tft.textWrite(rpmDisp);
-	}
-}
-
 void loop() {
-	//float xScale = 1024.0F / tft.width();
-	//float yScale = 1024.0F / tft.height();
+	float xScale = 1024.0F / tft.width();
+	float yScale = 1024.0F / tft.height();
 
 	demo();
 	printValues();
 
-	/* Wait around for touch events */
-	if (!digitalRead(RA8875_INT)) {
+	// Wait around for touch events
+	if (digitalRead(RA8875_INT)) {
 		if (tft.touched()) {
 			// Idea: Discard a warning message after abnormal values are read
+			
+			Serial.print("Touch: ");
+			//tft.invertDisplay(invert);
+			tft.touchRead(&tx, &ty);
+			Serial.print(tx); Serial.print(", "); Serial.println(ty);
+			// Draw a circle
+			tft.fillCircle((uint16_t)(tx / xScale), (uint16_t)(ty / yScale), 4, RA8875_WHITE);
 		}
 	}
 }
