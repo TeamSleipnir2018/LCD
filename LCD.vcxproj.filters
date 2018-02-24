@@ -17,9 +17,12 @@
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
+<<<<<<< HEAD
   <ItemGroup>
     <ClInclude Include="__vm\.LCD.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+=======
+>>>>>>> 086a262... Enlarged gear font
 </Project>
