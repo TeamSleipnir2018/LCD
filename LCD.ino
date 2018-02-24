@@ -5,6 +5,7 @@ Hardware:
 	- Arduino Pro Mini
 	- Adafruit RA8875 touch LCD controller
 	- 480 x 272 touch LCD
+	- NPIC6C4894 shift registers
 
 Written by Einar Arnason
 ******************************************************************/
@@ -13,6 +14,7 @@ Written by Einar Arnason
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_RA8875.h>
+#include <CAN.h>
 
 // Library only supports hardware SPI at this time
 // Connect SCLK to UNO Digital #13 (Hardware SPI clock)
@@ -21,7 +23,6 @@ Written by Einar Arnason
 const uint8_t RA8875_INT = 6;
 const uint8_t RA8875_CS = 10;
 const uint8_t RA8875_RESET = 9;
-const uint8_t LOGO_SIZE = 9391;
 
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
@@ -31,7 +32,7 @@ const uint16_t MAX_RPM = 14000;
 
 uint16_t rpm;
 uint16_t prevRPM;
-char rpmDisp[5];
+char rpmDisp[6];
 
 uint16_t oilTemp;
 uint16_t prevOilTemp;
@@ -71,15 +72,9 @@ const uint8_t WARNING_LIGHT7 = 2;
 const uint8_t WARNING_LIGHT8 = 1;
 const uint8_t SR_LEDBITS = 40;
 const uint8_t SR_WARNINGBITS = 8;
-const uint8_t RPM_SCALE = 350;
+const uint16_t RPM_SCALE = 350;
 uint8_t warningSetBits;
 uint8_t ledBarSetBits;
-/* 
-Because the cpu runs at 16MHz but the shift register
-clock runs at 8MHz, to syncronize without delay, an
-enabling switch is alternated.
-*/
-bool cycleSwitch;
 uint8_t srWarningCounter;
 uint8_t srLedCounter;
 
@@ -483,6 +478,7 @@ void printValue(const uint16_t& x,
 		tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	}
 	tft.textWrite(charValue);
+	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 }
 
 void printValues() {
@@ -520,11 +516,11 @@ void printValues() {
 		tempTimer++;
 	}
 	if (prevRPM != rpm) {
-		if (rpm == MAX_RPM) {
-			printValue(170, 200, rpm, prevRPM, rpmDisp, 2, true);
+		if (rpm > MAX_RPM - 500) {
+			printValue(160, 200, rpm, prevRPM, rpmDisp, 2, true);
 		}
 		else {
-			printValue(170, 200, rpm, prevRPM, rpmDisp, 2, false);
+			printValue(160, 200, rpm, prevRPM, rpmDisp, 2, false);
 		}
 	}
 	if (prevSpeed != speed) {
@@ -558,36 +554,23 @@ void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
 }
 
 void runShiftRegister() {
+	// Close the latch to write into register memory
 	digitalWrite(SR_LATCH, LOW);
-	if (cycleSwitch) {
-		if (srLedCounter < SR_LEDBITS) {
-			if (ledBarSetBits > 0) {
-				digitalWrite(SR_DATA_OUT, HIGH);
-				ledBarSetBits--;
-			}
-			srLedCounter++;
-		}
-		else if (srWarningCounter < SR_WARNINGBITS) {
-			if (warningSetBits & 1) {
-				digitalWrite(SR_DATA_OUT, HIGH);
-			}
-			warningSetBits >> 1;
-			srWarningCounter++;
+	// Scale RPM to number of LEDs
+	ledBarSetBits = rpm / RPM_SCALE;
+	// Shift bits to register
+	for (int i = 0; i < 48; i++) {	
+		if (i < ledBarSetBits + 8) {
+			digitalWrite(SR_DATA_OUT, HIGH);
 		}
 		else {
-			/*
-			Todo: check for values that set warning lights
-			and mask to set bits
-			*/
-
-			ledBarSetBits = rpm / RPM_SCALE;
-			srWarningCounter = 0;
-			srLedCounter = 0;
+			digitalWrite(SR_DATA_OUT, LOW);
 		}
+		// Manually set clock transition
+		digitalWrite(SR_CLOCK_OUT, LOW);
+		digitalWrite(SR_CLOCK_OUT, HIGH);
 	}
-	else {
-		digitalWrite(SR_DATA_OUT, LOW);
-	}
+	// Open latch and enable register outputs
 	digitalWrite(SR_LATCH, HIGH);
 }
 
@@ -595,11 +578,11 @@ void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
 
+	// Initialize the CAN bus
+	CAN.begin(500E3);
+
 	// Enable shiftregister output
 	pinMode(SR_CLOCK_OUT, OUTPUT);
-	TCCR1A = bit(COM1A0);
-	TCCR1B = bit(WGM12) | bit(CS10);
-	OCR1A = 0;
 	pinMode(SR_DATA_OUT, OUTPUT);
 	pinMode(SR_LATCH, OUTPUT);
 
@@ -655,7 +638,6 @@ void setup() {
 
 	// Initialize timers
 	tempTimer = 0;
-	cycleSwitch = true;
 
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
@@ -675,6 +657,7 @@ void loop() {
 
 	demo();
 	printValues();
+	runShiftRegister();
 
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
@@ -701,5 +684,8 @@ void loop() {
 			}
 		}
 	}
-	cycleSwitch = !cycleSwitch;
+
+	if (gear == 6 && rpm == 14000 && tempTimer == 255) {
+		setup();
+	}
 }
