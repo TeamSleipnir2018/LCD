@@ -18,10 +18,10 @@ Written by Einar Arnason
 // Connect SCLK to UNO Digital #13 (Hardware SPI clock)
 // Connect MISO to UNO Digital #12 (Hardware SPI MISO)
 // Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
-#define RA8875_INT 6
-#define RA8875_CS 10
-#define RA8875_RESET 9
-#define LOGO_SIZE 9391
+const uint8_t RA8875_INT = 6;
+const uint8_t RA8875_CS = 10;
+const uint8_t RA8875_RESET = 9;
+const uint8_t LOGO_SIZE = 9391;
 
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
@@ -56,10 +56,33 @@ bool fanOn;
 bool prevFanOn;
 
 // Shift register values
-#define sClockOut 9
-#define sDataOut 4
-#define sLatch 2
+const uint8_t SR_CLOCK_OUT = 9;
+const uint8_t SR_DATA_OUT = 4;
+const uint8_t SR_LATCH = 2;
+const uint8_t WARNING_LIGHT1 = 1;
+const uint8_t WARNING_LIGHT2 = 2;
+const uint8_t WARNING_LIGHT3 = 4;
+const uint8_t WARNING_LIGHT4 = 8;
+const uint8_t WARNING_LIGHT5 = 16;
+const uint8_t WARNING_LIGHT6 = 32;
+const uint8_t WARNING_LIGHT7 = 64;
+const uint8_t WARNING_LIGHT8 = 128;
+const uint8_t SR_LEDBITS = 40;
+const uint8_t SR_WARNINGBITS = 8;
+const uint8_t RPM_SCALE = 350;
+uint8_t warningSetBits;
+uint8_t ledBarSetBits;
+/* 
+Because the cpu runs at 16MHz but the shift register
+clock runs at 8MHz, to syncronize without delay, an
+enabling switch is alternated.
+*/
+bool cycleSwitch;
+uint8_t srWarningCounter;
+uint8_t srLedCounter;
 
+// Timers
+uint8_t tempTimer;
 
 // Speedometer vector
 int cX;
@@ -411,31 +434,6 @@ void demo() {
 		else {
 			rpm = 5500;
 		}
-
-		digitalWrite(sLatch, LOW);
-
-		if (sClockOut) {
-			digitalWrite(sDataOut, !digitalRead(sDataOut));
-		}
-		/*
-		int counter = 0;
-		while (counter < 11) {
-		if (sClockOut) {
-		digitalWrite(sDataOut, LOW);
-		counter++;
-		Serial.println("Clock");
-		}
-		}
-		counter = 0;
-		while (counter < 11) {
-		if (sClockOut) {
-		digitalWrite(sDataOut, HIGH);
-		counter++;
-		Serial.println("Clock");
-		}
-		}
-		*/
-		digitalWrite(sLatch, HIGH);
 	}
 
 	if (speed < 255 && gear != 0) {
@@ -475,17 +473,23 @@ void printValue(const uint16_t& x, const uint16_t& y, const uint16_t& value, uin
 }
 
 void printValues() {
-	if (prevOilTemp != oilTemp) {
-		printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1);
-		tft.textWrite(celcius);
+	if (tempTimer == 255) {
+		if (prevOilTemp != oilTemp) {
+			printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1);
+			tft.textWrite(celcius);
+		}
+		if (prevWaterTemp != waterTemp) {
+			printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1);
+			tft.textWrite(celcius);
+		}
+		if (prevBrakeTemp != brakeTemp) {
+			printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1);
+			tft.textWrite(celcius);
+		}
+		tempTimer = 0;
 	}
-	if (prevWaterTemp != waterTemp) {
-		printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1);
-		tft.textWrite(celcius);
-	}
-	if (prevBrakeTemp != brakeTemp) {
-		printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1);
-		tft.textWrite(celcius);
+	else {
+		tempTimer++;
 	}
 	if (prevRPM != rpm) {
 		printValue(170, 200, rpm, prevRPM, rpmDisp, 2);
@@ -520,15 +524,51 @@ void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
 	tft.drawLine(cX, cY, u, v, color);
 }
 
+void runShiftRegister() {
+	digitalWrite(SR_LATCH, LOW);
+	if (cycleSwitch) {
+		if (srWarningCounter < SR_WARNINGBITS) {
+			if (warningSetBits & 1) {
+				digitalWrite(SR_DATA_OUT, HIGH);
+			}
+			warningSetBits >> 1;
+			srWarningCounter++;
+		}
+		else if (srLedCounter < SR_LEDBITS) {
+			if (ledBarSetBits > 0) {
+				digitalWrite(SR_DATA_OUT, HIGH);
+				ledBarSetBits--;
+			}
+			srLedCounter++;
+		}
+		else {
+			/*
+			Todo: check for values that set warning lights
+			and mask to set bits
+			*/
+
+			ledBarSetBits = rpm / RPM_SCALE;
+			srWarningCounter = 0;
+			srLedCounter = 0;
+		}
+	}
+	else {
+		digitalWrite(SR_DATA_OUT, LOW);
+	}
+	digitalWrite(SR_LATCH, HIGH);
+}
+
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
 
-	// Enable shiftregister clock
-	pinMode(sClockOut, OUTPUT);
+	// Enable shiftregister output
+	pinMode(SR_CLOCK_OUT, OUTPUT);
 	TCCR1A = bit(COM1A0);
 	TCCR1B = bit(WGM12) | bit(CS10);
 	OCR1A = 0;
+	pinMode(SR_DATA_OUT, OUTPUT);
+	pinMode(SR_LATCH, OUTPUT);
 
 	// Initialise the display using 'RA8875_480x272'
 	if (!tft.begin(RA8875_480x272)) {
@@ -580,6 +620,10 @@ void setup() {
 	speedoRadius = 70;
 	speedCount = 0;
 
+	// Initialize timers
+	tempTimer = 0;
+	cycleSwitch = true;
+
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
 	// Draw the icon for cooling fan
@@ -593,7 +637,6 @@ void setup() {
 
 void loop() {
 	
-
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
 
@@ -625,4 +668,5 @@ void loop() {
 			}
 		}
 	}
+	cycleSwitch = !cycleSwitch;
 }
