@@ -16,6 +16,7 @@ Written by Einar Arnason
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_RA8875.h>
+<<<<<<< HEAD
 #include "./images/logo.h"
 #include "./images/fanIcon.h"
 #include "./images/brakeTempIcon.h"
@@ -23,25 +24,44 @@ Written by Einar Arnason
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
 #include "constants.h"
+=======
+#include "logo.h"
+#include "fanIcon.h"
+#include "CanListener.h"
+
+// Pin assignment
+// LCD
+const uint8_t RA8875_INT = 2;
+const uint8_t RA8875_CS = 10;
+const uint8_t RA8875_RESET = 9;
+// Shift register
+const uint8_t SR_CLOCK_OUT = 16;
+const uint8_t SR_DATA_OUT = 15;
+const uint8_t SR_LATCH = 14;
+>>>>>>> Fixing some conflicts
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
 // CAN BUS driver
+<<<<<<< HEAD
 class CanListener : public CANListener {
 public:
 	//overrides the parent version
 	bool frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller);
 };
+=======
+
+>>>>>>> Fixing some conflicts
 
 CanListener canListener;
 unsigned int txTimer, rxTimer;
 <<<<<<< HEAD
 =======
 // Translate float values from CAN BUS
-inline float CANIntToFloat(const uint16_t& floatValue) {
-	return floatValue / 1000;
+inline float CANIntToFloat(uint16_t floatValue) {
+	return floatValue / 1000.0;
 }
 >>>>>>> Merging
 
@@ -94,10 +114,63 @@ uint16_t speedCount;
 =======
 >>>>>>> Merging
 
+float voltage;
+float prevVoltage;
+char voltageDisp[6];
+
 bool fanOn;
 bool prevFanOn;
 
+<<<<<<< HEAD
 // Shift register variables
+=======
+bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
+
+	switch (frame.id) {
+	case 1:
+		speed = (frame.buf[1] << 8) | frame.buf[0];
+		voltage = CANIntToFloat((frame.buf[3] << 8) | frame.buf[2]);
+		break;
+	case 2:
+		oilTemp = (frame.buf[1] << 8) | frame.buf[0];
+		break;
+	}
+
+	return true;
+}
+
+// LCD positioning
+const uint16_t lcdWidth = 800;
+const uint16_t lcdHeight = 480;
+const uint16_t logoPos[] = { ((lcdWidth - logoWidth) / 2), ((lcdHeight - logoHeight) / 2) };
+const bool xPos = 0;
+const bool yPos = 1;
+const uint16_t gearSize = 20;
+const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
+const uint16_t oilLabelPos[] = { 10, 10 };
+const uint16_t oilTempPos[] = { 10, 80};
+const uint16_t waterLabelPos[] = { 10, 160 };
+const uint16_t waterTempPos[] = { 10, 230 };
+const uint16_t brakesLabelPos[] = { 10, 300 };
+const uint16_t brakesTempPos[] = { 10, 380 };
+const uint16_t speedLabelPos[] = { 620, 240 };
+const uint16_t speedPos[] = { 520, 240 };
+const uint16_t rpmLabelPos[] = { 480, 380 };
+const uint16_t rpmPos[] = { 320, 380 };
+
+// Shift register values
+const uint8_t WARNING_LIGHT1 = 128;
+const uint8_t WARNING_LIGHT2 = 64;
+const uint8_t WARNING_LIGHT3 = 32;
+const uint8_t WARNING_LIGHT4 = 16;
+const uint8_t WARNING_LIGHT5 = 8;
+const uint8_t WARNING_LIGHT6 = 4;
+const uint8_t WARNING_LIGHT7 = 2;
+const uint8_t WARNING_LIGHT8 = 1;
+const uint8_t SR_LEDBITS = 40;
+const uint8_t SR_WARNINGBITS = 8;
+const uint16_t RPM_SCALE = 350;
+>>>>>>> Fixing some conflicts
 uint8_t warningSetBits;
 uint8_t ledBarSetBits;
 uint8_t srWarningCounter;
@@ -131,6 +204,7 @@ int cY;
 uint16_t speedoRadius;
 */
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 void printIcons() {
 	tft.graphicsMode();
@@ -179,8 +253,12 @@ void printIcons() {
 	tft.textMode();
 =======
 // Celcius symbol, b0 is a RA8875 specific value for ° symbol
+=======
+// Celcius symbol, b0 is a RA8875 specific value for ï¿½ symbol
+>>>>>>> Fixing some conflicts
 const static char celcius[3] = { 0xb0, 0x43 };
 
+/*
 void demo() {
 	if (rpm != MAX_RPM) {
 		rpm += 25;
@@ -210,6 +288,7 @@ void demo() {
 	}
 >>>>>>> Merging
 }
+*/
 
 void printLabels() {
 	tft.textEnlarge(3);
@@ -546,6 +625,7 @@ void runShiftRegister() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 void listenOnCAN() {
 
@@ -609,6 +689,8 @@ void listenOnCAN() {
 }
 
 >>>>>>> Merging
+=======
+>>>>>>> Fixing some conflicts
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
@@ -673,7 +755,11 @@ void setup() {
 	fanOn = false;
 	prevFanOn = true;
 	voltage = 0.0;
+<<<<<<< HEAD
 	prevVoltage = 1.0;
+=======
+	prevVoltage = 0.0;
+>>>>>>> Fixing some conflicts
 
 	/*
 	// Initialize circular speedometer values
@@ -705,7 +791,15 @@ void loop() {
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
 
+<<<<<<< HEAD
 	demo();
+=======
+	//demo();
+	Serial.println(voltage);
+	delay(500);
+	printValues();
+	runShiftRegister();
+>>>>>>> Fixing some conflicts
 
 	
 	// Wait around for touch events
