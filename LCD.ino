@@ -41,7 +41,7 @@ static CAN_message_t msg, rxmsg;
 int txCount, rxCount;
 unsigned int txTimer, rxTimer;
 // Translate float values from CAN BUS
-inline float CANIntToFloat(uint16_t floatValue) {
+inline float CANIntToFloat(const uint16_t& floatValue) {
 	return floatValue / 1000;
 }
 
@@ -68,17 +68,10 @@ uint8_t gear;
 uint8_t prevGear;
 char gearDisp;
 
-<<<<<<< HEAD
-uint8_t speed;
-uint8_t prevSpeed;
-char speedDisp[2];
-uint8_t speedCount;
-=======
 uint16_t speed;
 uint16_t prevSpeed;
 char speedDisp[3];
 uint16_t speedCount;
->>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
 
 bool fanOn;
 bool prevFanOn;
@@ -129,7 +122,7 @@ int cY;
 uint16_t speedoRadius;
 */
 
-// Celcius symbol
+// Celcius symbol, b0 is a RA8875 specific value for ° symbol
 const static char celcius[3] = { 0xb0, 0x43 };
 
 void demo() {
@@ -353,6 +346,8 @@ void listenOnCAN() {
 	float values need to by divided with 1000
 	use function CANIntToFloat()
 	*/
+
+
 	
 	/*
 	//example code
@@ -403,29 +398,6 @@ void listenOnCAN() {
 	*/
 }
 
-void drawLogo(int16_t x, int16_t y,
-	const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color1, uint16_t color2) {
-
-	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-	uint8_t byte = 0;
-
-	tft.startWrite();
-	for (int16_t j = 0; j<h; j++, y++) {
-		for (int16_t i = 0; i<w; i++) {
-			if (i & 7) byte >>= 1;
-			else      byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
-			// Nearly identical to drawBitmap(), only the bit order
-			// is reversed here (left-to-right = LSB to MSB):
-			if (byte & 0xff) {
-				tft.writePixel(x + i, y, color1);
-			}
-			else if (byte & 0x01) {
-				tft.writePixel(x + i, y, color2);
-			}
-		}
-	}
-	tft.endWrite();
-}
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
