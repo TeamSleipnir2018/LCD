@@ -37,6 +37,13 @@ public:
 
 CanListener canListener;
 unsigned int txTimer, rxTimer;
+<<<<<<< HEAD
+=======
+// Translate float values from CAN BUS
+inline float CANIntToFloat(const uint16_t& floatValue) {
+	return floatValue / 1000;
+}
+>>>>>>> Merging
 
 // Vehicle values
 uint16_t rpm;
@@ -60,6 +67,7 @@ uint8_t prevGear;
 char gearDisp;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 uint16_t speed;
 uint16_t prevSpeed;
 char speedDisp[3];
@@ -74,12 +82,17 @@ uint8_t prevSpeed;
 char speedDisp[2];
 uint8_t speedCount;
 =======
+=======
+>>>>>>> Merging
 uint16_t speed;
 uint16_t prevSpeed;
 char speedDisp[3];
 uint16_t speedCount;
+<<<<<<< HEAD
 >>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
 >>>>>>> Cleanup
+=======
+>>>>>>> Merging
 
 bool fanOn;
 bool prevFanOn;
@@ -118,6 +131,7 @@ int cY;
 uint16_t speedoRadius;
 */
 
+<<<<<<< HEAD
 void printIcons() {
 	tft.graphicsMode();
 	// Draw the icon for cooling fan
@@ -163,6 +177,38 @@ void printIcons() {
 		RA8875_WHITE
 	);
 	tft.textMode();
+=======
+// Celcius symbol, b0 is a RA8875 specific value for ° symbol
+const static char celcius[3] = { 0xb0, 0x43 };
+
+void demo() {
+	if (rpm != MAX_RPM) {
+		rpm += 25;
+	}
+	else {
+		oilTemp = random(110, 150);
+		waterTemp = random(110, 150);
+		brakeTemp = random(110, 150);
+		
+		if (gear < 6) {
+			gear++;
+			rpm = 2000;
+		}
+		else {
+			rpm = 13500;
+		}
+	}
+
+	if (speed < 255 && gear != 0) {
+		if (speedCount == 5) {
+			speed++;
+			speedCount = 0;
+		}
+		else {
+			speedCount++;
+		}
+	}
+>>>>>>> Merging
 }
 
 void printLabels() {
@@ -499,6 +545,70 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, HIGH);
 }
 
+<<<<<<< HEAD
+=======
+void listenOnCAN() {
+
+	/*
+	Todo: 
+	CAN BUS sends 4 uint16_t variables per block
+	variables are little-endian
+	float values need to by divided with 1000
+	use function CANIntToFloat()
+	*/
+
+
+	
+	/*
+	//example code
+	// service software timers based on Metro tick
+	if (sysTimer.check()) {
+		if (txTimer) {
+			--txTimer;
+		}
+		if (rxTimer) {
+			--rxTimer;
+		}
+	}
+
+	// if not time-delayed, read CAN messages and print 1st byte
+	if (!rxTimer) {
+		while (CANbus.read(rxmsg)) {
+			Serial.print(rxmsg.id);
+			//hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
+			Serial.write(rxmsg.buf[0]);
+			rxCount++;
+		}
+	}
+
+	// insert a time delay between transmissions
+	if (!txTimer) {
+		// if frames were received, print the count
+		if (rxCount) {
+			Serial.write('=');
+			Serial.print(rxCount);
+			rxCount = 0;
+		}
+		txTimer = 100;//milliseconds
+		msg.len = 8;
+		msg.id = 0x222;
+		for (int idx = 0; idx<8; ++idx) {
+			msg.buf[idx] = '0' + idx;
+		}
+		// send 6 at a time to force tx buffering
+		txCount = 6;
+		Serial.println(".");
+		while (txCount--) {
+			CANbus.write(msg);
+			msg.buf[0]++;
+		}
+		// time delay to force some rx data queue use
+		rxTimer = 3;//milliseconds
+	}
+	*/
+}
+
+>>>>>>> Merging
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
