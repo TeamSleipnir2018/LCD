@@ -149,6 +149,13 @@
 >>>>>>> Enlarged gear font
 =======
   <ItemGroup>
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="images\batteryIcon.h" />
+    <ClInclude Include="images\brakeTempIcon.h" />
+    <ClInclude Include="images\fanIcon.h" />
+    <ClInclude Include="images\logo.h" />
+    <ClInclude Include="images\oilTempIcon.h" />
+    <ClInclude Include="images\waterTempIcon.h" />
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
   </ItemGroup>
 >>>>>>> Added Shift register support for LED bars

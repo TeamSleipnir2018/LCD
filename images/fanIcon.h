@@ -1,9 +1,14 @@
 #pragma once
 
+<<<<<<< HEAD:fanIcon.h
 <<<<<<< HEAD
 <<<<<<< HEAD
 const uint16_t fanWidth = 70;
 const uint16_t fanHeight = 70;
+=======
+const static uint8_t fanWidth = 70;
+const static uint8_t fanHeight = 70;
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file:images/fanIcon.h
 
 // Fan icon 25x25px XBM
 const static uint8_t fanIcon[] PROGMEM = {
