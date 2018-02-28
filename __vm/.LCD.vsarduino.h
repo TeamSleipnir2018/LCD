@@ -7,6 +7,7 @@
 	
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Hardware: Teensy 3.2 / 3.1, Platform=teensy3, Package=teensy
 =======
 	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
@@ -14,12 +15,16 @@
 =======
 	Hardware: Arduino Pro or Pro Mini w/ ATmega328P (5V, 16 MHz), Platform=avr, Package=arduino
 >>>>>>> Fixed wrong order on shift registers and added warning display on values
+=======
+	Hardware: Arduino Pro or Pro Mini w/ ATmega328P (5V, 16 MHz), Platform=avr, Package=arduino
+>>>>>>> Updated info
 */
 
 #if defined(_VMICRO_INTELLISENSE)
 
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
+<<<<<<< HEAD
 <<<<<<< HEAD
 #define __HARDWARE_MK20dx256__
 #define __HARDWARE_MK20DX256__
@@ -30,12 +35,15 @@
 #define USB_SERIAL
 #define LAYOUT_US_ENGLISH
 =======
+=======
+>>>>>>> Updated info
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
 #define F_CPU 16000000L
 #define ARDUINO 10805
 #define ARDUINO_AVR_PRO
 #define ARDUINO_ARCH_AVR
+<<<<<<< HEAD
 >>>>>>> Added Shift register support for LED bars
 #define __cplusplus 201103L
 #define __arm__
@@ -78,10 +86,53 @@ typedef void *__builtin_va_list;
 =======
 #include <Arduino.h>
 =======
+=======
+#define __cplusplus 201103L
+#define __AVR__
+#define __inline__
+#define __asm__(...)
+#define __extension__
+#define __inline__
+#define __volatile__
+#define GCC_VERSION 40902
+
+#define __cplusplus 201103L
+#undef __cplusplus
+#define __cplusplus 201103L
+
+#define volatile(va_arg) 
+#define _CONST
+#define __builtin_va_start
+#define __builtin_va_end
+#define __attribute__(...)
+#define NOINLINE __attribute__((noinline))
+#define prog_void
+#define PGM_VOID_P int
+
+
+#ifndef __builtin_constant_p
+	#define __builtin_constant_p __attribute__((__const__))
+#endif
+#ifndef __builtin_strlen
+	#define __builtin_strlen  __attribute__((__const__))
+#endif
+
+
+#define NEW_H
+typedef void *__builtin_va_list;
+//extern "C" void __cxa_pure_virtual() {;}
+
+typedef int div_t;
+typedef int ldiv_t;
+
+
+typedef void *__builtin_va_list;
+>>>>>>> Updated info
 //extern "C" void __cxa_pure_virtual() {;}
 
 
 
+<<<<<<< HEAD
 #include <arduino.h>
 >>>>>>> Fixed wrong order on shift registers and added warning display on values
 #include <pins_arduino.h> 
@@ -97,5 +148,22 @@ typedef void *__builtin_va_list;
 
 #define NEW_H
 #include "LCD.ino"
+=======
+#include <Arduino.h>
+#include <pins_arduino.h> 
+#undef F
+#define F(string_literal) ((const PROGMEM char *)(string_literal))
+#undef PSTR
+#define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
+
+
+#define pgm_read_byte(address_short) uint8_t() 
+#define pgm_read_word(address_short) uint16_t() 
+#define pgm_read_dword(address_short) uint32_t()
+#define pgm_read_float(address_short) float()
+#define pgm_read_ptr(address_short)   short()
+
+#include "SleipnirLCD.ino"
+>>>>>>> Updated info
 #endif
 #endif
