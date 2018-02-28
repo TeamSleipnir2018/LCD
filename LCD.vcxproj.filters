@@ -5,6 +5,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> Enlarged gear font
@@ -27,6 +28,15 @@
 =======
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
 >>>>>>> Calibrated CAN BUS
+=======
+    <ClInclude Include="images\batteryIcon.h" />
+    <ClInclude Include="images\brakeTempIcon.h" />
+    <ClInclude Include="images\fanIcon.h" />
+    <ClInclude Include="images\logo.h" />
+    <ClInclude Include="images\oilTempIcon.h" />
+    <ClInclude Include="images\waterTempIcon.h" />
+    <ClInclude Include="constants.h" />
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />

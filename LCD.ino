@@ -17,52 +17,44 @@ Written by Einar Arnason
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_RA8875.h>
-#include "logo.h"
-#include "fanIcon.h"
-#include "CanListener.h"
-
-// Pin assignment
-// LCD
-const uint8_t RA8875_INT = 2;
-const uint8_t RA8875_CS = 10;
-const uint8_t RA8875_RESET = 9;
-// Shift register
-const uint8_t SR_CLOCK_OUT = 16;
-const uint8_t SR_DATA_OUT = 15;
-const uint8_t SR_LATCH = 14;
+#include "./images/logo.h"
+#include "./images/fanIcon.h"
+#include "./images/brakeTempIcon.h"
+#include "./images/oilTempIcon.h"
+#include "./images/waterTempIcon.h"
+#include "./images/batteryIcon.h"
+#include "constants.h"
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
 // CAN BUS driver
-
+class CanListener : public CANListener {
+public:
+	//overrides the parent version
+	bool frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller);
+};
 
 CanListener canListener;
 unsigned int txTimer, rxTimer;
-// Translate float values from CAN BUS
-inline float CANIntToFloat(uint16_t floatValue) {
-	return floatValue / 1000.0;
-}
 
 // Vehicle values
-const uint16_t MAX_RPM = 14000;
-
 uint16_t rpm;
 uint16_t prevRPM;
 char rpmDisp[6];
 
-uint16_t oilTemp;
-uint16_t prevOilTemp;
-char oilTempDisp[5];
+float oilTemp;
+float prevOilTemp;
+char oilTempDisp[8];
 
-uint16_t waterTemp;
-uint16_t prevWaterTemp;
-char waterTempDisp[5];
+float waterTemp;
+float prevWaterTemp;
+char waterTempDisp[8];
 
 uint16_t brakeTemp;
 uint16_t prevBrakeTemp;
-char brakeTempDisp[5];
+char brakeTempDisp[8];
 
 uint8_t gear;
 uint8_t prevGear;
@@ -77,8 +69,12 @@ uint16_t speedCount;
 
 float voltage;
 float prevVoltage;
+<<<<<<< HEAD
 char voltageDisp[6];
 >>>>>>> Calibrated CAN BUS
+=======
+char voltageDisp[8];
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
 
 bool fanOn;
 bool prevFanOn;
@@ -87,52 +83,19 @@ bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t contro
 
 	switch (frame.id) {
 	case 1:
-		speed = (frame.buf[1] << 8) | frame.buf[0];
-		voltage = CANIntToFloat((frame.buf[3] << 8) | frame.buf[2]);
+		rpm = frame.buf[0] | (frame.buf[1] << 8);
+		voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
+		waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
+		speed = frame.buf[6] | (frame.buf[7] << 8);
 		break;
 	case 2:
-		oilTemp = (frame.buf[1] << 8) | frame.buf[0];
+		oilTemp = CANKelvinToFloat(frame.buf[0] | (frame.buf[1] << 8));
+		gear = frame.buf[2] | (frame.buf[3] << 8);
 		break;
 	}
 
 	return true;
 }
-
-// LCD positioning
-const uint16_t lcdWidth = 800;
-const uint16_t lcdHeight = 480;
-const uint16_t logoPos[] = { ((lcdWidth - logoWidth) / 2), ((lcdHeight - logoHeight) / 2) };
-const bool xPos = 0;
-const bool yPos = 1;
-const uint16_t gearSize = 20;
-const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
-const uint16_t oilLabelPos[] = { 10, 10 };
-const uint16_t oilTempPos[] = { 10, 80};
-const uint16_t waterLabelPos[] = { 10, 160 };
-const uint16_t waterTempPos[] = { 10, 230 };
-const uint16_t brakesLabelPos[] = { 10, 300 };
-const uint16_t brakesTempPos[] = { 10, 380 };
-const uint16_t speedLabelPos[] = { 620, 240 };
-const uint16_t speedPos[] = { 520, 240 };
-const uint16_t rpmLabelPos[] = { 480, 380 };
-const uint16_t rpmPos[] = { 320, 380 };
-
-// Shift register values
-const uint8_t WARNING_LIGHT1 = 128;
-const uint8_t WARNING_LIGHT2 = 64;
-const uint8_t WARNING_LIGHT3 = 32;
-const uint8_t WARNING_LIGHT4 = 16;
-const uint8_t WARNING_LIGHT5 = 8;
-const uint8_t WARNING_LIGHT6 = 4;
-const uint8_t WARNING_LIGHT7 = 2;
-const uint8_t WARNING_LIGHT8 = 1;
-const uint8_t SR_LEDBITS = 40;
-const uint8_t SR_WARNINGBITS = 8;
-const uint16_t RPM_SCALE = 350;
-uint8_t warningSetBits;
-uint8_t ledBarSetBits;
-uint8_t srWarningCounter;
-uint8_t srLedCounter;
 
 // Timers
 uint8_t tempTimer;
@@ -143,9 +106,6 @@ int cX;
 int cY;
 uint16_t speedoRadius;
 */
-
-// Celcius symbol
-const static char celcius[3] = { 0xb0, 0x43 };
 
 /*
 void demo() {
@@ -178,34 +138,96 @@ void demo() {
 }
 */
 
+void printIcons() {
+	tft.graphicsMode();
+	// Draw the icon for cooling fan
+	tft.drawXBitmap(
+		fanIconPos[xPos], 
+		fanIconPos[yPos], 
+		fanIcon, 
+		fanWidth, 
+		fanHeight, 
+		RA8875_WHITE
+	);
+	tft.drawXBitmap(
+		batteryIconPos[xPos], 
+		batteryIconPos[yPos], 
+		batteryIcon, 
+		batteryWidth, 
+		batteryHeight, 
+		RA8875_WHITE
+	);
+	//drawFanDisabled();
+	tft.drawXBitmap(
+		oilLabelPos[xPos], 
+		oilLabelPos[yPos], 
+		oilTempIcon, 
+		oilTempWidth, 
+		oilTempHeight, 
+		RA8875_WHITE
+	);
+	tft.drawXBitmap(
+		waterLabelPos[xPos],
+		waterLabelPos[yPos],
+		waterTempIcon,
+		waterTempWidth,
+		waterTempHeight,
+		RA8875_WHITE
+	);
+	tft.drawXBitmap(
+		brakesLabelPos[xPos],
+		brakesLabelPos[yPos],
+		brakeTempIcon,
+		brakeTempWidth,
+		brakeTempHeight,
+		RA8875_WHITE
+	);
+	tft.textMode();
+}
+
 void printLabels() {
-	tft.textSetCursor(oilLabelPos[xPos], oilLabelPos[yPos]);
 	tft.textEnlarge(3);
-	tft.textColor(RA8875_WHITE, RA8875_BLACK);
-	tft.textWrite("OIL: ");
-	tft.textSetCursor(waterLabelPos[xPos], waterLabelPos[yPos]);
-	tft.textWrite("WATER: ");
-	tft.textSetCursor(brakesLabelPos[xPos], brakesLabelPos[yPos]);
-	tft.textWrite("BRAKES: ");
-	// Ment for circular speedometer
-	//tft.drawCircle(370, 110, 80, 0xffff);
 	tft.textSetCursor(speedLabelPos[xPos], speedLabelPos[yPos]);
 	tft.textWrite("km/h");
 	tft.textSetCursor(rpmLabelPos[xPos], rpmLabelPos[yPos]);
-	tft.textEnlarge(3);
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	tft.textWrite(" RPM");
 }
 
-void printValue(const uint16_t& x,
-				const uint16_t& y,
-				const uint16_t& value,
-				uint16_t& prevValue,
-				char* charValue,
-				const uint8_t& fontSize,
-				bool warning) {
+void printInt(const uint16_t& x,
+	const uint16_t& y,
+	const uint16_t& value,
+	uint16_t& prevValue,
+	char* charValue,
+	const uint8_t& fontSize,
+	bool warning) {
+
 	sprintf(charValue, "%d", value);
 	prevValue = value;
+	printValue(x, y, charValue, fontSize, warning);
+}
+
+void printFloat(
+	const uint16_t& x,
+	const uint16_t& y,
+	const float& value,
+	float& prevValue,
+	char* charValue,
+	const uint8_t& fontSize,
+	bool warning) {
+
+	sprintf(charValue, "%.02f", value);
+	prevValue = value;
+	printValue(x, y, charValue, fontSize, warning);
+}
+
+void printValue(
+	const uint16_t& x,
+	const uint16_t& y,
+	char* charValue, 
+	const uint8_t& fontSize,
+	bool warning
+	) {
 	tft.textSetCursor(x, y);
 	tft.textEnlarge(fontSize);
 	if (warning) {
@@ -219,45 +241,121 @@ void printValue(const uint16_t& x,
 }
 
 void printValues() {
-	if (tempTimer == 255) {
+	//if (tempTimer == 0) {
+		if (voltage != prevVoltage) {
+			printFloat(
+				voltagePos[xPos],
+				voltagePos[yPos],
+				voltage,
+				prevVoltage,
+				voltageDisp,
+				3,
+				false
+			);
+			tft.textWrite("v");
+		}
 		if (prevOilTemp != oilTemp) {
 			if (oilTemp > 250) {
-				printValue(oilTempPos[xPos], oilTempPos[yPos], oilTemp, prevOilTemp, oilTempDisp, 3, true);
+				printFloat(
+					oilTempPos[xPos], 
+					oilTempPos[yPos], 
+					oilTemp, 
+					prevOilTemp, 
+					oilTempDisp, 
+					3, 
+					true
+				);
 			}
 			else {
-				printValue(oilTempPos[xPos], oilTempPos[yPos], oilTemp, prevOilTemp, oilTempDisp, 3, false);
+				printFloat(
+					oilTempPos[xPos], 
+					oilTempPos[yPos], 
+					oilTemp, 
+					prevOilTemp, 
+					oilTempDisp, 
+					3, 
+					false
+				);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevWaterTemp != waterTemp) {
 			if (waterTemp > 250) {
-				printValue(waterTempPos[xPos], waterTempPos[yPos], waterTemp, prevWaterTemp, waterTempDisp, 3, true);
+				printFloat(
+					waterTempPos[xPos], 
+					waterTempPos[yPos], 
+					waterTemp, 
+					prevWaterTemp, 
+					waterTempDisp, 
+					3, 
+					true
+				);
 			}
 			else {
-				printValue(waterTempPos[xPos], waterTempPos[yPos], waterTemp, prevWaterTemp, waterTempDisp, 3, false);
+				printFloat(
+					waterTempPos[xPos], 
+					waterTempPos[yPos], 
+					waterTemp, 
+					prevWaterTemp, 
+					waterTempDisp, 
+					3, 
+					false
+				);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevBrakeTemp != brakeTemp) {
 			if (brakeTemp > 250) {
-				printValue(brakesTempPos[xPos], brakesTempPos[yPos], brakeTemp, prevBrakeTemp, brakeTempDisp, 3, true);
+				printInt(
+					brakesTempPos[xPos], 
+					brakesTempPos[yPos], 
+					brakeTemp, 
+					prevBrakeTemp, 
+					brakeTempDisp, 
+					3, 
+					true
+				);
 			}
 			else {
-				printValue(brakesTempPos[xPos], brakesTempPos[yPos], brakeTemp, prevBrakeTemp, brakeTempDisp, 3, false);
+				printInt(
+					brakesTempPos[xPos], 
+					brakesTempPos[yPos], 
+					brakeTemp, 
+					prevBrakeTemp, 
+					brakeTempDisp, 
+					3, 
+					false
+				);
 			}
 			tft.textWrite(celcius);
 		}
 		tempTimer = 0;
-	}
+	/*}
 	else {
 		tempTimer++;
-	}
+	}*/
 	if (prevRPM != rpm) {
 		if (rpm > MAX_RPM - 500) {
-			printValue(rpmPos[xPos], rpmPos[yPos], rpm, prevRPM, rpmDisp, 3, true);
+			printInt(
+				rpmPos[xPos], 
+				rpmPos[yPos], 
+				rpm, 
+				prevRPM, 
+				rpmDisp, 
+				3, 
+				true
+			);
 		}
 		else {
-			printValue(rpmPos[xPos], rpmPos[yPos], rpm, prevRPM, rpmDisp, 3, false);
+			printInt(
+				rpmPos[xPos], 
+				rpmPos[yPos], 
+				rpm, 
+				prevRPM, 
+				rpmDisp, 
+				3, 
+				false
+			);
 		}
 	}
 	if (prevSpeed != speed) {
@@ -265,7 +363,15 @@ void printValues() {
 		//drawSpeedLine(prevSpeed, 0x0000);
 		//drawSpeedLine(speed, RA8875_RED);
 		
-		printValue(speedPos[xPos], speedPos[yPos], speed, prevSpeed, speedDisp, 3, false);
+		printInt(
+			speedPos[xPos], 
+			speedPos[yPos], 
+			speed, 
+			prevSpeed, 
+			speedDisp, 
+			3, 
+			false
+		);
 		switch (speed) {
 		case 18 :
 			tft.fillRect(500, 210, 18, 30, 0xffff);
@@ -310,7 +416,7 @@ void printValues() {
 			tft.fillRect(760, 125, 18, 100, 0xf800);
 			break;
 		}
-		//prevSpeed = speed;
+		prevSpeed = speed;
 	}
 	if (prevGear != gear) {
 		if (gear == 0) {
@@ -408,20 +514,21 @@ void setup() {
 
 	// Initialize car values
 	rpm = 0;
-	oilTemp = 0;
-	prevOilTemp = 255;
-	waterTemp = 0;
-	prevWaterTemp = 255;
+	prevRPM = 1;
+	oilTemp = 0.0;
+	prevOilTemp = 1.0;
+	waterTemp = 0.0;
+	prevWaterTemp = 1.0;
 	brakeTemp = 0;
-	prevBrakeTemp = 255;
+	prevBrakeTemp = 1;
 	gear = 0;
-	prevGear = 255;
+	prevGear = 1;
 	speed = 0;
-	prevSpeed = 255;
+	prevSpeed = 1;
 	fanOn = false;
 	prevFanOn = true;
 	voltage = 0.0;
-	prevVoltage = 0.0;
+	prevVoltage = 1.0;
 
 	/*
 	// Initialize circular speedometer values
@@ -436,11 +543,9 @@ void setup() {
 
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
-	// Draw the icon for cooling fan
-	tft.drawXBitmap(225, 10, fanIcon, fanWidth, fanHeight, 0xffff);
-	drawFanDisabled();
 	tft.textMode();
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
+	printIcons();
 	printLabels();
 	printValues();
 }
@@ -451,8 +556,7 @@ void loop() {
 	float yScale = 1024.0F / tft.height();
 
 	//demo();
-	Serial.println(voltage);
-	delay(500);
+
 	printValues();
 	runShiftRegister();
 
@@ -481,8 +585,9 @@ void loop() {
 			}
 		}
 	}
-
+	/*
 	if (gear == 6 && rpm == 14000 && tempTimer == 255) {
 		setup();
 	}
+	*/
 }

@@ -26,7 +26,9 @@
     "rawenginespeed",
     "synclosscount",
     "calpot",
-    "lambda"
+    "lambda",
+    "gear",
+    "oiltemp"
   ],
   "rtgroups":{
     "analog":[
@@ -18492,10 +18494,15 @@
                 "const_zero",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Calibrated CAN BUS
                 "oilpress",
                 "ecutemp",
+=======
+                "oiltemp",
+                "gear",
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
                 "airtemp",
                 "injangle1",
                 "enginespeed",
