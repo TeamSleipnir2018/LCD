@@ -6,10 +6,14 @@
 			note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Hardware: Teensy 3.2 / 3.1, Platform=teensy3, Package=teensy
 =======
 	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
 >>>>>>> Added Shift register support for LED bars
+=======
+	Hardware: Arduino Pro or Pro Mini w/ ATmega328P (5V, 16 MHz), Platform=avr, Package=arduino
+>>>>>>> Fixed wrong order on shift registers and added warning display on values
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -29,7 +33,7 @@
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
 #define F_CPU 16000000L
-#define ARDUINO 106011
+#define ARDUINO 10805
 #define ARDUINO_AVR_PRO
 #define ARDUINO_ARCH_AVR
 >>>>>>> Added Shift register support for LED bars
@@ -64,6 +68,7 @@ typedef void *__builtin_va_list;
 #define __extension__
 #define  __attribute__(x)
 typedef void *__builtin_va_list;
+<<<<<<< HEAD
 #define __extension__
 #define __ATTR_PURE__
 #define __ATTR_CONST__
@@ -72,9 +77,16 @@ typedef void *__builtin_va_list;
 #define __volatile__
 =======
 #include <Arduino.h>
+=======
+//extern "C" void __cxa_pure_virtual() {;}
+
+
+
+#include <arduino.h>
+>>>>>>> Fixed wrong order on shift registers and added warning display on values
 #include <pins_arduino.h> 
-#undef F
-#define F(string_literal) ((const PROGMEM char *)(string_literal))
+//#undef F
+//#define F(string_literal) ((const PROGMEM char *)(string_literal))
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
 >>>>>>> Added Shift register support for LED bars
