@@ -133,6 +133,7 @@ typedef void *__builtin_va_list;
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <arduino.h>
 >>>>>>> Fixed wrong order on shift registers and added warning display on values
 #include <pins_arduino.h> 
@@ -150,9 +151,12 @@ typedef void *__builtin_va_list;
 #include "LCD.ino"
 =======
 #include <Arduino.h>
+=======
+#include <arduino.h>
+>>>>>>> Fixed char overflow after IDE update
 #include <pins_arduino.h> 
-#undef F
-#define F(string_literal) ((const PROGMEM char *)(string_literal))
+//#undef F
+//#define F(string_literal) ((const PROGMEM char *)(string_literal))
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
 
@@ -163,7 +167,11 @@ typedef void *__builtin_va_list;
 #define pgm_read_float(address_short) float()
 #define pgm_read_ptr(address_short)   short()
 
+<<<<<<< HEAD
 #include "SleipnirLCD.ino"
 >>>>>>> Updated info
+=======
+#include "LCD.ino"
+>>>>>>> Fixed char overflow after IDE update
 #endif
 #endif
