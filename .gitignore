@@ -294,8 +294,12 @@ __vm/
 Debug/
 
 # vscode arduino extension
+<<<<<<< HEAD
 .vscode/
 =======
 >>>>>>> Initial commit
 =======
 >>>>>>> Initial commit
+=======
+.vscode/
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
