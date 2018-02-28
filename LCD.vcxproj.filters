@@ -1,38 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Enlarged gear font
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-<<<<<<< HEAD
->>>>>>> Enlarged gear font
-=======
->>>>>>> Enlarged gear font
-=======
-    <ClInclude Include="__vm\.LCD.vsarduino.h" />
->>>>>>> Calibrated CAN BUS
-=======
-=======
-    <ClInclude Include="__vm\.LCD.vsarduino.h" />
->>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
     <ClInclude Include="images\batteryIcon.h" />
     <ClInclude Include="images\brakeTempIcon.h" />
     <ClInclude Include="images\fanIcon.h" />
@@ -40,32 +9,8 @@
     <ClInclude Include="images\oilTempIcon.h" />
     <ClInclude Include="images\waterTempIcon.h" />
     <ClInclude Include="constants.h" />
-<<<<<<< HEAD
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-=======
->>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Added Shift register support for LED bars
-  <ItemGroup>
-    <ClInclude Include="__vm\.LCD.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-<<<<<<< HEAD
-=======
->>>>>>> Enlarged gear font
-=======
->>>>>>> Added Shift register support for LED bars
-=======
->>>>>>> Calibrated CAN BUS
-=======
->>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
 </Project>
