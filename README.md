@@ -16,6 +16,7 @@ Steering wheel LCD controller
 <<<<<<< HEAD
 <<<<<<< HEAD
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
+<<<<<<< HEAD
 =======
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
 
@@ -30,3 +31,11 @@ Steering wheel LCD controller
 =======
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
 >>>>>>> Added dependencies to readme
+=======
+
+## Syncing repositories:
+This repository is a git/subversion hybrid.
+To sync from svn to git
+`git svn fetch`
+`git rebase trunk`
+>>>>>>> Added repository sync instructions
