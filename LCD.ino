@@ -2,9 +2,9 @@
 Team Sleipnir steering wheel LCD
 
 Hardware:
-	- Teensy 3.2 (Previously Arduino Pro Mini)
+	- Teensy 3.2
 	- Adafruit RA8875 touch LCD controller
-	- 480 x 272 touch LCD
+	- 800 x 480 LCD
 	- NPIC6C4894 shift registers
 
 Written by Einar Arnason
@@ -38,7 +38,6 @@ uint16_t tx, ty;
 FlexCAN CANbus(3);
 Metro sysTimer = Metro(1);// milliseconds
 static CAN_message_t msg, rxmsg;
-//static uint8_t hex[17] = "0123456789abcdef";
 int txCount, rxCount;
 unsigned int txTimer, rxTimer;
 // Translate float values from CAN BUS
@@ -78,19 +77,23 @@ bool fanOn;
 bool prevFanOn;
 
 // LCD positioning
+const uint16_t lcdWidth = 800;
+const uint16_t lcdHeight = 480;
+const uint16_t logoPos[] = { ((lcdWidth - logoWidth) / 2), ((lcdHeight - logoHeight) / 2) };
 const bool xPos = 0;
 const bool yPos = 1;
-const uint16_t gearPos[] = { 360, 200 };
-const uint16_t oilLabelPos[] = {10, 10};
-//const uint16_t oilTempPos[];
+const uint16_t gearSize = 20;
+const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
+const uint16_t oilLabelPos[] = { 10, 10 };
+const uint16_t oilTempPos[] = { 10, 80};
 const uint16_t waterLabelPos[] = { 10, 160 };
-//const uint16_t waterTempPos[];
+const uint16_t waterTempPos[] = { 10, 230 };
 const uint16_t brakesLabelPos[] = { 10, 300 };
-//const uint16_t brakesTempPos[];
+const uint16_t brakesTempPos[] = { 10, 380 };
 const uint16_t speedLabelPos[] = { 620, 240 };
-//const uint16_t speedPos[];
-const uint16_t rpmLabelPos[] = { 500, 400 };
-//const uint16_t rpmPos[];
+const uint16_t speedPos[] = { 520, 240 };
+const uint16_t rpmLabelPos[] = { 480, 380 };
+const uint16_t rpmPos[] = { 320, 380 };
 
 // Shift register values
 const uint8_t WARNING_LIGHT1 = 128;
@@ -112,12 +115,14 @@ uint8_t srLedCounter;
 // Timers
 uint8_t tempTimer;
 
-// Speedometer vector
+/*
+// Circular speedometer vector
 int cX;
 int cY;
 uint16_t speedoRadius;
+*/
 
-// Celcius symbol for arduino
+// Celcius symbol
 const static char celcius[3] = { 0xb0, 0x43 };
 
 void demo() {
@@ -139,7 +144,7 @@ void demo() {
 	}
 
 	if (speed < 255 && gear != 0) {
-		if (speedCount == 3) {
+		if (speedCount == 5) {
 			speed++;
 			speedCount = 0;
 		}
@@ -158,6 +163,7 @@ void printLabels() {
 	tft.textWrite("WATER: ");
 	tft.textSetCursor(brakesLabelPos[xPos], brakesLabelPos[yPos]);
 	tft.textWrite("BRAKES: ");
+	// Ment for circular speedometer
 	//tft.drawCircle(370, 110, 80, 0xffff);
 	tft.textSetCursor(speedLabelPos[xPos], speedLabelPos[yPos]);
 	tft.textWrite("km/h");
@@ -192,28 +198,28 @@ void printValues() {
 	if (tempTimer == 255) {
 		if (prevOilTemp != oilTemp) {
 			if (oilTemp > 250) {
-				printValue(10, 80, oilTemp, prevOilTemp, oilTempDisp, 3, true);
+				printValue(oilTempPos[xPos], oilTempPos[yPos], oilTemp, prevOilTemp, oilTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 80, oilTemp, prevOilTemp, oilTempDisp, 3, false);
+				printValue(oilTempPos[xPos], oilTempPos[yPos], oilTemp, prevOilTemp, oilTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevWaterTemp != waterTemp) {
 			if (waterTemp > 250) {
-				printValue(10, 230, waterTemp, prevWaterTemp, waterTempDisp, 3, true);
+				printValue(waterTempPos[xPos], waterTempPos[yPos], waterTemp, prevWaterTemp, waterTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 230, waterTemp, prevWaterTemp, waterTempDisp, 3, false);
+				printValue(waterTempPos[xPos], waterTempPos[yPos], waterTemp, prevWaterTemp, waterTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
 		if (prevBrakeTemp != brakeTemp) {
 			if (brakeTemp > 250) {
-				printValue(10, 380, brakeTemp, prevBrakeTemp, brakeTempDisp, 3, true);
+				printValue(brakesTempPos[xPos], brakesTempPos[yPos], brakeTemp, prevBrakeTemp, brakeTempDisp, 3, true);
 			}
 			else {
-				printValue(10, 380, brakeTemp, prevBrakeTemp, brakeTempDisp, 3, false);
+				printValue(brakesTempPos[xPos], brakesTempPos[yPos], brakeTemp, prevBrakeTemp, brakeTempDisp, 3, false);
 			}
 			tft.textWrite(celcius);
 		}
@@ -224,10 +230,10 @@ void printValues() {
 	}
 	if (prevRPM != rpm) {
 		if (rpm > MAX_RPM - 500) {
-			printValue(340, 400, rpm, prevRPM, rpmDisp, 3, true);
+			printValue(rpmPos[xPos], rpmPos[yPos], rpm, prevRPM, rpmDisp, 3, true);
 		}
 		else {
-			printValue(340, 400, rpm, prevRPM, rpmDisp, 3, false);
+			printValue(rpmPos[xPos], rpmPos[yPos], rpm, prevRPM, rpmDisp, 3, false);
 		}
 	}
 	if (prevSpeed != speed) {
@@ -235,47 +241,62 @@ void printValues() {
 		//drawSpeedLine(prevSpeed, 0x0000);
 		//drawSpeedLine(speed, RA8875_RED);
 		
-		printValue(520, 230, speed, prevSpeed, speedDisp, 3, false);
+		printValue(speedPos[xPos], speedPos[yPos], speed, prevSpeed, speedDisp, 3, false);
 		switch (speed) {
-		case 28 :
+		case 18 :
 			tft.fillRect(500, 210, 18, 30, 0xffff);
 			break;
-		case 56 :
+		case 36 :
 			tft.fillRect(520, 200, 18, 35, 0xf877);
 			break;
-		case 84 :
+		case 54 :
 			tft.fillRect(540, 190, 18, 40, 0xf866);
 			break;
-		case 112 :
+		case 72 :
 			tft.fillRect(560, 180, 18, 45, 0xf855);
 			break;
-		case 140 :
+		case 90 :
 			tft.fillRect(580, 170, 18, 50, 0xf844);
 			break;
-		case 168 :
+		case 108 :
 			tft.fillRect(600, 165, 18, 55, 0xf833);
 			break;
-		case 196 :
+		case 126 :
 			tft.fillRect(620, 160, 18, 60, 0xf822);
 			break;
-		case 224 :
+		case 144 :
 			tft.fillRect(640, 155, 18, 65, 0xf811);
 			break;
-		case 252 :
-			tft.fillRect(660, 150, 18, 70, 0xf800);
+		case 162 :
+			tft.fillRect(660, 150, 18, 75, 0xf800);
+			break;
+		case 180:
+			tft.fillRect(680, 145, 18, 80, 0xf800);
+			break;
+		case 198:
+			tft.fillRect(700, 140, 18, 85, 0xf800);
+			break;
+		case 216:
+			tft.fillRect(720, 135, 18, 90, 0xf800);
+			break;
+		case 234:
+			tft.fillRect(740, 130, 18, 95, 0xf800);
+			break;
+		case 252:
+			tft.fillRect(760, 125, 18, 100, 0xf800);
 			break;
 		}
 		//prevSpeed = speed;
 	}
 	if (prevGear != gear) {
 		if (gear == 0) {
-			tft.drawChar(gearPos[xPos], gearPos[yPos], 'N', 0xffff, 0x0000, 20);
+			tft.drawChar(gearPos[xPos], gearPos[yPos], 'N', 0xffff, 0x0000, gearSize);
 			prevGear = gear;
 		}
 		else {
 			gearDisp = 48 + gear;
 			prevGear = gear;
-			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, 20);
+			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, gearSize);
 		}
 	}
 }
@@ -285,12 +306,15 @@ void drawFanDisabled() {
 	tft.drawLine(225, 10, 251, 36, RA8875_RED);
 }
 
+/*
+// Draws the line in a circular speedometer
 void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
 	int speedToDeg = 315 - value;
 	int u = (speedoRadius * sin(speedToDeg * (PI / 180))) + cX;
 	int v = (speedoRadius * cos(speedToDeg * (PI / 180))) + cY;
 	tft.drawLine(cX, cY, u, v, color);
 }
+*/
 
 void runShiftRegister() {
 	// Close the latch to write into register memory
@@ -372,8 +396,29 @@ void listenOnCAN() {
 	*/
 }
 
-const CAN_filter_t canFilter = { 0, 0, 0 };
+void drawLogo(int16_t x, int16_t y,
+	const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color1, uint16_t color2) {
 
+	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+	uint8_t byte = 0;
+
+	tft.startWrite();
+	for (int16_t j = 0; j<h; j++, y++) {
+		for (int16_t i = 0; i<w; i++) {
+			if (i & 7) byte >>= 1;
+			else      byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
+			// Nearly identical to drawBitmap(), only the bit order
+			// is reversed here (left-to-right = LSB to MSB):
+			if (byte & 0xff) {
+				tft.writePixel(x + i, y, color1);
+			}
+			else if (byte & 0x01) {
+				tft.writePixel(x + i, y, color2);
+			}
+		}
+	}
+	tft.endWrite();
+}
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
@@ -387,9 +432,9 @@ void setup() {
 	pinMode(SR_LATCH, OUTPUT);
 
 	// Initialise the display using 'RA8875_480x272'
-	if (!tft.begin(RA8875_800x480)) {
+	while (!tft.begin(RA8875_800x480)) {
 		Serial.println("RA8875 Not Found!");
-		while (1);
+		delay(1000);
 	}
 	digitalWrite(RA8875_CS, LOW);
 
@@ -402,7 +447,8 @@ void setup() {
 	
 	//Draw logo
 	tft.graphicsMode();
-	tft.drawXBitmap(8, 104, logo, 464, 64, RA8875_RED);
+	tft.fillScreen(RA8875_BLACK);
+	tft.drawXBitmap(logoPos[xPos], logoPos[yPos], logo, logoWidth, logoHeight, RA8875_RED);
 	
 	// Fade in and wait 2s
 	for (uint8_t i = 0; i != 255; i += 5) {
@@ -431,11 +477,13 @@ void setup() {
 	fanOn = false;
 	prevFanOn = true;
 
-	// Initialize speedometer values
+	/*
+	// Initialize circular speedometer values
 	cX = 370;
 	cY = 110;
 	speedoRadius = 70;
 	speedCount = 0;
+	*/
 
 	// Initialize timers
 	tempTimer = 0;
@@ -443,7 +491,7 @@ void setup() {
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
 	// Draw the icon for cooling fan
-	tft.drawXBitmap(225, 10, fanIcon, 25, 25, 0xffff);
+	tft.drawXBitmap(225, 10, fanIcon, fanWidth, fanHeight, 0xffff);
 	drawFanDisabled();
 	tft.textMode();
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
@@ -480,7 +528,7 @@ void loop() {
 					else {
 						tft.graphicsMode();
 						tft.fillRect(215, 0, 50, 50, 0x0000);
-						tft.drawXBitmap(225, 10, fanIcon, 25, 25, 0xffff);
+						tft.drawXBitmap(225, 10, fanIcon, fanWidth, fanHeight, 0xffff);
 						tft.textMode();
 						fanOn = true;
 					}
