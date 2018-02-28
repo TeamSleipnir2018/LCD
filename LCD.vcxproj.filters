@@ -3,6 +3,7 @@
   <ItemGroup>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
 =======
 =======
@@ -23,10 +24,14 @@
 >>>>>>> Enlarged gear font
 =======
 >>>>>>> Enlarged gear font
+=======
+    <ClInclude Include="__vm\.LCD.vsarduino.h" />
+>>>>>>> Calibrated CAN BUS
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -41,4 +46,6 @@
 >>>>>>> Enlarged gear font
 =======
 >>>>>>> Added Shift register support for LED bars
+=======
+>>>>>>> Calibrated CAN BUS
 </Project>
