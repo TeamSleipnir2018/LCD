@@ -1,7 +1,12 @@
 /******************************************************************
 Team Sleipnir steering wheel LCD
 
-Written by Einar Þórir Árnason
+Hardware:
+	- Arduino Pro Mini
+	- Adafruit RA8875 touch LCD controller
+	- 480 x 272 touch LCD
+
+Written by Einar Arnason
 ******************************************************************/
 
 #include <SPI.h>
@@ -20,6 +25,7 @@ Written by Einar Þórir Árnason
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
+// Vehicle values
 uint16_t rpm;
 uint16_t prevRPM;
 char rpmDisp[4];
@@ -352,10 +358,6 @@ void loop() {
 
 	demo();
 	printValues();
-	Serial.println(gearDisp);
-	Serial.println(rpmDisp);
-	Serial.println(oilTempDisp);
-	//delay(135);
 
 	/* Wait around for touch events */
 	if (!digitalRead(RA8875_INT)) {
