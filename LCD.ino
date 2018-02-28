@@ -19,6 +19,7 @@ Written by Einar Arnason
 #include <Adafruit_RA8875.h>
 #include "logo.h"
 #include "fanIcon.h"
+#include "CanListener.h"
 
 // Pin assignment
 // LCD
@@ -35,14 +36,13 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
 // CAN BUS driver
-FlexCAN CANbus(3);
-Metro sysTimer = Metro(1);// milliseconds
-static CAN_message_t msg, rxmsg;
-int txCount, rxCount;
+
+
+CanListener canListener;
 unsigned int txTimer, rxTimer;
 // Translate float values from CAN BUS
 inline float CANIntToFloat(uint16_t floatValue) {
-	return floatValue / 1000;
+	return floatValue / 1000.0;
 }
 
 // Vehicle values
@@ -72,9 +72,31 @@ uint16_t speed;
 uint16_t prevSpeed;
 char speedDisp[3];
 uint16_t speedCount;
+<<<<<<< HEAD
+=======
+
+float voltage;
+float prevVoltage;
+char voltageDisp[6];
+>>>>>>> Calibrated CAN BUS
 
 bool fanOn;
 bool prevFanOn;
+
+bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
+
+	switch (frame.id) {
+	case 1:
+		speed = (frame.buf[1] << 8) | frame.buf[0];
+		voltage = CANIntToFloat((frame.buf[3] << 8) | frame.buf[2]);
+		break;
+	case 2:
+		oilTemp = (frame.buf[1] << 8) | frame.buf[0];
+		break;
+	}
+
+	return true;
+}
 
 // LCD positioning
 const uint16_t lcdWidth = 800;
@@ -125,6 +147,7 @@ uint16_t speedoRadius;
 // Celcius symbol
 const static char celcius[3] = { 0xb0, 0x43 };
 
+/*
 void demo() {
 	if (rpm != MAX_RPM) {
 		rpm += 25;
@@ -153,6 +176,7 @@ void demo() {
 		}
 	}
 }
+*/
 
 void printLabels() {
 	tft.textSetCursor(oilLabelPos[xPos], oilLabelPos[yPos]);
@@ -337,94 +361,14 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, HIGH);
 }
 
-void listenOnCAN() {
-
-	/*
-	Todo: 
-	CAN BUS sends 4 uint16_t variables per block
-	variables are little-endian
-	float values need to by divided with 1000
-	use function CANIntToFloat()
-	*/
-	
-	/*
-	//example code
-	// service software timers based on Metro tick
-	if (sysTimer.check()) {
-		if (txTimer) {
-			--txTimer;
-		}
-		if (rxTimer) {
-			--rxTimer;
-		}
-	}
-
-	// if not time-delayed, read CAN messages and print 1st byte
-	if (!rxTimer) {
-		while (CANbus.read(rxmsg)) {
-			Serial.print(rxmsg.id);
-			//hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
-			Serial.write(rxmsg.buf[0]);
-			rxCount++;
-		}
-	}
-
-	// insert a time delay between transmissions
-	if (!txTimer) {
-		// if frames were received, print the count
-		if (rxCount) {
-			Serial.write('=');
-			Serial.print(rxCount);
-			rxCount = 0;
-		}
-		txTimer = 100;//milliseconds
-		msg.len = 8;
-		msg.id = 0x222;
-		for (int idx = 0; idx<8; ++idx) {
-			msg.buf[idx] = '0' + idx;
-		}
-		// send 6 at a time to force tx buffering
-		txCount = 6;
-		Serial.println(".");
-		while (txCount--) {
-			CANbus.write(msg);
-			msg.buf[0]++;
-		}
-		// time delay to force some rx data queue use
-		rxTimer = 3;//milliseconds
-	}
-	*/
-}
-
-void drawLogo(int16_t x, int16_t y,
-	const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color1, uint16_t color2) {
-
-	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-	uint8_t byte = 0;
-
-	tft.startWrite();
-	for (int16_t j = 0; j<h; j++, y++) {
-		for (int16_t i = 0; i<w; i++) {
-			if (i & 7) byte >>= 1;
-			else      byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
-			// Nearly identical to drawBitmap(), only the bit order
-			// is reversed here (left-to-right = LSB to MSB):
-			if (byte & 0xff) {
-				tft.writePixel(x + i, y, color1);
-			}
-			else if (byte & 0x01) {
-				tft.writePixel(x + i, y, color2);
-			}
-		}
-	}
-	tft.endWrite();
-}
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
 
 	// Initialize the CAN bus
-	CANbus.begin();
+	Can0.begin(500000);
+	Can0.attachObj(&canListener);
+	canListener.attachGeneralHandler();
 
 	// Enable shiftregister output
 	pinMode(SR_CLOCK_OUT, OUTPUT);
@@ -476,6 +420,8 @@ void setup() {
 	prevSpeed = 255;
 	fanOn = false;
 	prevFanOn = true;
+	voltage = 0.0;
+	prevVoltage = 0.0;
 
 	/*
 	// Initialize circular speedometer values
@@ -497,8 +443,6 @@ void setup() {
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	printLabels();
 	printValues();
-
-	sysTimer.reset();
 }
 
 void loop() {
@@ -506,10 +450,11 @@ void loop() {
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
 
-	demo();
+	//demo();
+	Serial.println(voltage);
+	delay(500);
 	printValues();
 	runShiftRegister();
-	//listenOnCAN();
 
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
