@@ -28,11 +28,17 @@
     <None Include="LCD.ino" />
   </ItemGroup>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Added Shift register support for LED bars
   <ItemGroup>
     <ClInclude Include="__vm\.LCD.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+<<<<<<< HEAD
 =======
 >>>>>>> Enlarged gear font
+=======
+>>>>>>> Added Shift register support for LED bars
 </Project>
