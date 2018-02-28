@@ -27,6 +27,8 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
 // Vehicle values
+const uint16_t MAX_RPM = 14000;
+
 uint16_t rpm;
 uint16_t prevRPM;
 char rpmDisp[5];
@@ -59,14 +61,14 @@ bool prevFanOn;
 const uint8_t SR_CLOCK_OUT = 9;
 const uint8_t SR_DATA_OUT = 4;
 const uint8_t SR_LATCH = 2;
-const uint8_t WARNING_LIGHT1 = 1;
-const uint8_t WARNING_LIGHT2 = 2;
-const uint8_t WARNING_LIGHT3 = 4;
-const uint8_t WARNING_LIGHT4 = 8;
-const uint8_t WARNING_LIGHT5 = 16;
-const uint8_t WARNING_LIGHT6 = 32;
-const uint8_t WARNING_LIGHT7 = 64;
-const uint8_t WARNING_LIGHT8 = 128;
+const uint8_t WARNING_LIGHT1 = 128;
+const uint8_t WARNING_LIGHT2 = 64;
+const uint8_t WARNING_LIGHT3 = 32;
+const uint8_t WARNING_LIGHT4 = 16;
+const uint8_t WARNING_LIGHT5 = 8;
+const uint8_t WARNING_LIGHT6 = 4;
+const uint8_t WARNING_LIGHT7 = 2;
+const uint8_t WARNING_LIGHT8 = 1;
 const uint8_t SR_LEDBITS = 40;
 const uint8_t SR_WARNINGBITS = 8;
 const uint8_t RPM_SCALE = 350;
@@ -419,7 +421,7 @@ const static uint8_t fanIcon[] PROGMEM = {
 };
 
 void demo() {
-	if (rpm != 6000) {
+	if (rpm != MAX_RPM) {
 		rpm += 25;
 	}
 	else {
@@ -432,7 +434,7 @@ void demo() {
 			rpm = 2000;
 		}
 		else {
-			rpm = 5500;
+			rpm = 13500;
 		}
 	}
 
@@ -463,27 +465,53 @@ void printLabels() {
 	tft.textWrite(" RPM");
 }
 
-void printValue(const uint16_t& x, const uint16_t& y, const uint16_t& value, uint16_t& prevValue, char* charValue, const uint8_t& fontSize) {
+void printValue(const uint16_t& x,
+				const uint16_t& y,
+				const uint16_t& value,
+				uint16_t& prevValue,
+				char* charValue,
+				const uint8_t& fontSize,
+				bool warning) {
 	sprintf(charValue, "%d", value);
 	prevValue = value;
 	tft.textSetCursor(x, y);
 	tft.textEnlarge(fontSize);
-	tft.textColor(RA8875_WHITE, RA8875_BLACK);
+	if (warning) {
+		tft.textColor(RA8875_BLACK, RA8875_RED);
+	}
+	else {
+		tft.textColor(RA8875_WHITE, RA8875_BLACK);
+	}
 	tft.textWrite(charValue);
 }
 
 void printValues() {
 	if (tempTimer == 255) {
 		if (prevOilTemp != oilTemp) {
-			printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1);
+			if (oilTemp > 250) {
+				printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1, true);
+			}
+			else {
+				printValue(10, 50, oilTemp, prevOilTemp, oilTempDisp, 1, false);
+			}
 			tft.textWrite(celcius);
 		}
 		if (prevWaterTemp != waterTemp) {
-			printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1);
+			if (waterTemp > 250) {
+				printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1, true);
+			}
+			else {
+				printValue(10, 135, waterTemp, prevWaterTemp, waterTempDisp, 1, false);
+			}
 			tft.textWrite(celcius);
 		}
 		if (prevBrakeTemp != brakeTemp) {
-			printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1);
+			if (brakeTemp > 250) {
+				printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1, true);
+			}
+			else {
+				printValue(10, 220, brakeTemp, prevBrakeTemp, brakeTempDisp, 1, false);
+			}
 			tft.textWrite(celcius);
 		}
 		tempTimer = 0;
@@ -492,7 +520,12 @@ void printValues() {
 		tempTimer++;
 	}
 	if (prevRPM != rpm) {
-		printValue(170, 200, rpm, prevRPM, rpmDisp, 2);
+		if (rpm == MAX_RPM) {
+			printValue(170, 200, rpm, prevRPM, rpmDisp, 2, true);
+		}
+		else {
+			printValue(170, 200, rpm, prevRPM, rpmDisp, 2, false);
+		}
 	}
 	if (prevSpeed != speed) {
 		drawSpeedLine(prevSpeed, 0x0000);
@@ -527,19 +560,19 @@ void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
 void runShiftRegister() {
 	digitalWrite(SR_LATCH, LOW);
 	if (cycleSwitch) {
-		if (srWarningCounter < SR_WARNINGBITS) {
-			if (warningSetBits & 1) {
-				digitalWrite(SR_DATA_OUT, HIGH);
-			}
-			warningSetBits >> 1;
-			srWarningCounter++;
-		}
-		else if (srLedCounter < SR_LEDBITS) {
+		if (srLedCounter < SR_LEDBITS) {
 			if (ledBarSetBits > 0) {
 				digitalWrite(SR_DATA_OUT, HIGH);
 				ledBarSetBits--;
 			}
 			srLedCounter++;
+		}
+		else if (srWarningCounter < SR_WARNINGBITS) {
+			if (warningSetBits & 1) {
+				digitalWrite(SR_DATA_OUT, HIGH);
+			}
+			warningSetBits >> 1;
+			srWarningCounter++;
 		}
 		else {
 			/*

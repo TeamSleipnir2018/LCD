@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Hardware: Teensy 3.2 / 3.1, Platform=teensy3, Package=teensy
 =======
 	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
@@ -22,6 +23,9 @@
 =======
 	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
 >>>>>>> Added Shift register support for LED bars
+=======
+	Hardware: Arduino Pro or Pro Mini w/ ATmega328P (5V, 16 MHz), Platform=avr, Package=arduino
+>>>>>>> Fixed wrong order on shift registers and added warning display on values
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -44,7 +48,7 @@
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
 #define F_CPU 16000000L
-#define ARDUINO 106011
+#define ARDUINO 10805
 #define ARDUINO_AVR_PRO
 #define ARDUINO_ARCH_AVR
 <<<<<<< HEAD
@@ -139,6 +143,7 @@ typedef void *__builtin_va_list;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <arduino.h>
 >>>>>>> Fixed wrong order on shift registers and added warning display on values
 #include <pins_arduino.h> 
@@ -162,9 +167,12 @@ typedef void *__builtin_va_list;
 =======
 #include <Arduino.h>
 >>>>>>> Added Shift register support for LED bars
+=======
+#include <arduino.h>
+>>>>>>> Fixed wrong order on shift registers and added warning display on values
 #include <pins_arduino.h> 
-#undef F
-#define F(string_literal) ((const PROGMEM char *)(string_literal))
+//#undef F
+//#define F(string_literal) ((const PROGMEM char *)(string_literal))
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
 
