@@ -286,6 +286,7 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+<<<<<<< HEAD
 
 # Visual Micro
 __vm/
@@ -293,3 +294,5 @@ Debug/
 
 # vscode arduino extension
 .vscode/
+=======
+>>>>>>> Initial commit
