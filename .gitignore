@@ -287,6 +287,7 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Visual Micro
 __vm/
@@ -294,5 +295,7 @@ Debug/
 
 # vscode arduino extension
 .vscode/
+=======
+>>>>>>> Initial commit
 =======
 >>>>>>> Initial commit
