@@ -1,7 +1,7 @@
 #pragma once
 
-const uint16_t fanWidth = 70;
-const uint16_t fanHeight = 70;
+const static uint8_t fanWidth = 70;
+const static uint8_t fanHeight = 70;
 
 // Fan icon 25x25px XBM
 const static uint8_t fanIcon[] PROGMEM = {

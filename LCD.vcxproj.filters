@@ -2,6 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
+    <ClInclude Include="images\batteryIcon.h" />
+    <ClInclude Include="images\brakeTempIcon.h" />
+    <ClInclude Include="images\fanIcon.h" />
+    <ClInclude Include="images\logo.h" />
+    <ClInclude Include="images\oilTempIcon.h" />
+    <ClInclude Include="images\waterTempIcon.h" />
+    <ClInclude Include="constants.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />
