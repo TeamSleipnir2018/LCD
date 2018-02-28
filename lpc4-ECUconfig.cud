@@ -18417,12 +18417,17 @@
                 "const_zero",
                 "const_zero",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "oiltemp",
                 "gear",
 =======
                 "oilpress",
                 "ecutemp",
 >>>>>>> Fixing some conflicts
+=======
+                "oiltemp",
+                "gear",
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
                 "airtemp",
                 "injangle1",
                 "enginespeed",

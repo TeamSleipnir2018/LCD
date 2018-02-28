@@ -81,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
     <ClInclude Include="constants.h" />
     <ClInclude Include="images\batteryIcon.h" />
     <ClInclude Include="images\brakeTempIcon.h" />
@@ -88,8 +91,11 @@
     <ClInclude Include="images\logo.h" />
     <ClInclude Include="images\oilTempIcon.h" />
     <ClInclude Include="images\waterTempIcon.h" />
+<<<<<<< HEAD
 =======
 >>>>>>> Cleanup
+=======
+>>>>>>> Added icons, calibrated ECU values, moved constants to another file
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>
