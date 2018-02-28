@@ -2,6 +2,7 @@
 Steering wheel LCD controller
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Added dependencies to readme
 
@@ -20,3 +21,5 @@ Steering wheel LCD controller
 =======
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
 >>>>>>> Added dependencies to readme
+=======
+>>>>>>> Initial commit
