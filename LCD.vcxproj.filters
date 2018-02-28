@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
 <<<<<<< HEAD
 =======
@@ -29,6 +30,9 @@
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
 >>>>>>> Calibrated CAN BUS
 =======
+=======
+    <ClInclude Include="__vm\.LCD.vsarduino.h" />
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
     <ClInclude Include="images\batteryIcon.h" />
     <ClInclude Include="images\brakeTempIcon.h" />
     <ClInclude Include="images\fanIcon.h" />
@@ -36,11 +40,15 @@
     <ClInclude Include="images\oilTempIcon.h" />
     <ClInclude Include="images\waterTempIcon.h" />
     <ClInclude Include="constants.h" />
+<<<<<<< HEAD
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
+=======
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -58,4 +66,6 @@
 >>>>>>> Added Shift register support for LED bars
 =======
 >>>>>>> Calibrated CAN BUS
+=======
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
 </Project>

@@ -65,6 +65,7 @@ uint16_t prevSpeed;
 char speedDisp[3];
 uint16_t speedCount;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 float voltage;
@@ -75,6 +76,12 @@ char voltageDisp[6];
 =======
 char voltageDisp[8];
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
+=======
+
+float voltage;
+float prevVoltage;
+char voltageDisp[8];
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
 
 bool fanOn;
 bool prevFanOn;

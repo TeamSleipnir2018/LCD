@@ -15,12 +15,17 @@ Steering wheel LCD controller
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
 <<<<<<< HEAD
 =======
 [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
+=======
+[https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
 
 >>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
+<<<<<<< HEAD
 =======
 >>>>>>> Initial commit
 =======
@@ -39,3 +44,5 @@ To sync from svn to git
 `git svn fetch`
 `git rebase trunk`
 >>>>>>> Added repository sync instructions
+=======
+>>>>>>> d721caabeeccfc277234d41934ca7bab6c907772
