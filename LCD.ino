@@ -449,9 +449,19 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
 	ledBarSetBits = rpm / RPM_SCALE;
+	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
+	
 	// Shift bits to register
-	for (int i = 0; i < TOTAL_LEDS; i++) {	
-		if (i < (ledBarSetBits + 8)) {
+	for (int i = 0; i < 8; i++) {
+		
+		digitalWrite(SR_DATA_OUT, (warning & 0x1));
+		digitalWrite(SR_CLOCK_OUT, LOW);
+		digitalWrite(SR_CLOCK_OUT, HIGH);
+		warning = warning >> 1;
+	}
+
+	for (int i = 0; i < (TOTAL_LEDS - 8); i++) {	
+		if (i < ledBarSetBits) {
 			digitalWrite(SR_DATA_OUT, HIGH);
 		}
 		else {
@@ -480,6 +490,7 @@ void setup() {
 	pinMode(SR_LATCH, OUTPUT);
 	pinMode(SR_OUTPUT_ENABLE, OUTPUT);
 	digitalWrite(SR_OUTPUT_ENABLE, HIGH);
+	warningSetBits = 0;
 
 	// Initialise the display using 'RA8875_480x272'
 	while (!tft.begin(RA8875_800x480)) {
