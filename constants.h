@@ -4,15 +4,14 @@
 	Pin assignment
 */
 // LCD
-const uint8_t RA8875_INT = 2;
+const uint8_t RA8875_INT = 8;
 const uint8_t RA8875_CS = 10;
 const uint8_t RA8875_RESET = 9;
 // Shift register
-const uint8_t SR_CLOCK_OUT = 16;
-const uint8_t SR_DATA_OUT = 15;
-const uint8_t SR_LATCH = 14;
-
-const uint16_t MAX_RPM = 14000;
+const uint8_t SR_CLOCK_OUT = 17;
+const uint8_t SR_DATA_OUT = 18;
+const uint8_t SR_LATCH = 19;
+const uint8_t SR_OUTPUT_ENABLE = 16;
 
 // Translate float values from CAN BUS
 inline float CANIntToFloat(uint16_t floatValue) {
@@ -60,10 +59,9 @@ const uint8_t WARNING_LIGHT8 = 1;
 const uint8_t SR_LEDBITS = 40;
 const uint8_t SR_WARNINGBITS = 8;
 const uint16_t RPM_SCALE = 350;
-uint8_t warningSetBits;
-uint8_t ledBarSetBits;
-uint8_t srWarningCounter;
-uint8_t srLedCounter;
+const uint8_t TOTAL_LEDS = 48;
+
+const uint16_t MAX_RPM = 14000;
 
 // Celcius symbol
 const static char celcius[3] = { 0xb0, 0x43 };
