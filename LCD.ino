@@ -214,7 +214,7 @@ void printFloat(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%.02f", value);
+	sprintf(charValue, "%.01f", value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -452,7 +452,7 @@ void runShiftRegister() {
 	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < SR_WARNINGBITS; i++) {
 		
 		digitalWrite(SR_DATA_OUT, (warning & 0x1));
 		digitalWrite(SR_CLOCK_OUT, LOW);
@@ -460,7 +460,7 @@ void runShiftRegister() {
 		warning = warning >> 1;
 	}
 
-	for (int i = 0; i < (TOTAL_LEDS - 8); i++) {	
+	for (int i = 0; i < SR_LEDBITS; i++) {	
 		if (i < ledBarSetBits) {
 			digitalWrite(SR_DATA_OUT, HIGH);
 		}
