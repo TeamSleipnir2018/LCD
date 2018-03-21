@@ -452,7 +452,11 @@ void runShiftRegister() {
 	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
+<<<<<<< HEAD
 	for (int i = 0; i < SR_WARNINGBITS; i++) {
+=======
+	for (int i = 0; i < 8; i++) {
+>>>>>>> 7760e033d239e64fdc114cee01613531cabb7575
 		
 		digitalWrite(SR_DATA_OUT, (warning & 0x1));
 		digitalWrite(SR_CLOCK_OUT, LOW);
@@ -460,7 +464,11 @@ void runShiftRegister() {
 		warning = warning >> 1;
 	}
 
+<<<<<<< HEAD
 	for (int i = 0; i < SR_LEDBITS; i++) {	
+=======
+	for (int i = 0; i < (TOTAL_LEDS - 8); i++) {	
+>>>>>>> 7760e033d239e64fdc114cee01613531cabb7575
 		if (i < ledBarSetBits) {
 			digitalWrite(SR_DATA_OUT, HIGH);
 		}
