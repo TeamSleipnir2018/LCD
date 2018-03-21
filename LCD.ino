@@ -10,7 +10,6 @@ Hardware:
 Written by Einar Arnason
 ******************************************************************/
 
-#include <kinetis_flexcan.h>
 #include <FlexCAN.h>
 #include <Metro.h>
 #include <SPI.h>
@@ -72,6 +71,12 @@ char voltageDisp[8];
 bool fanOn;
 bool prevFanOn;
 
+// Shift register variables
+uint8_t warningSetBits;
+uint8_t ledBarSetBits;
+uint8_t srWarningCounter;
+uint8_t srLedCounter;
+
 bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
 
 	switch (frame.id) {
@@ -100,7 +105,7 @@ int cY;
 uint16_t speedoRadius;
 */
 
-/*
+
 void demo() {
 	if (rpm != MAX_RPM) {
 		rpm += 25;
@@ -129,7 +134,7 @@ void demo() {
 		}
 	}
 }
-*/
+
 
 void printIcons() {
 	tft.graphicsMode();
@@ -445,8 +450,8 @@ void runShiftRegister() {
 	// Scale RPM to number of LEDs
 	ledBarSetBits = rpm / RPM_SCALE;
 	// Shift bits to register
-	for (int i = 0; i < 48; i++) {	
-		if (i < ledBarSetBits + 8) {
+	for (int i = 0; i < TOTAL_LEDS; i++) {	
+		if (i < (ledBarSetBits + 8)) {
 			digitalWrite(SR_DATA_OUT, HIGH);
 		}
 		else {
@@ -473,6 +478,8 @@ void setup() {
 	pinMode(SR_CLOCK_OUT, OUTPUT);
 	pinMode(SR_DATA_OUT, OUTPUT);
 	pinMode(SR_LATCH, OUTPUT);
+	pinMode(SR_OUTPUT_ENABLE, OUTPUT);
+	digitalWrite(SR_OUTPUT_ENABLE, HIGH);
 
 	// Initialise the display using 'RA8875_480x272'
 	while (!tft.begin(RA8875_800x480)) {
@@ -544,15 +551,16 @@ void setup() {
 }
 
 void loop() {
-	
-	float xScale = 1024.0F / tft.width();
-	float yScale = 1024.0F / tft.height();
-
-	//demo();
 
 	printValues();
 	runShiftRegister();
+	/*
+	float xScale = 1024.0F / tft.width();
+	float yScale = 1024.0F / tft.height();
 
+	demo();
+
+	
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
 		if (tft.touched()) {
@@ -578,7 +586,7 @@ void loop() {
 			}
 		}
 	}
-	/*
+	
 	if (gear == 6 && rpm == 14000 && tempTimer == 255) {
 		setup();
 	}
