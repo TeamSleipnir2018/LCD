@@ -192,6 +192,16 @@ void printLabels() {
 	tft.textWrite(" RPM");
 }
 
+void printFrames() {
+	tft.drawFastVLine(280, 0, 480, RA8875_WHITE);
+	tft.drawFastVLine(500, 0, 480 - (480 - 350), RA8875_WHITE);
+	tft.drawFastHLine(280, 350, (800 - 280), RA8875_WHITE);
+	tft.drawFastHLine(0, oilTempPos[yPos] + oilTempHeight + 30, 280, RA8875_WHITE);
+	tft.drawFastHLine(0, waterTempPos[yPos] + waterTempHeight + 30, 280, RA8875_WHITE);
+	tft.drawFastHLine(0, brakesTempPos[yPos] + brakeTempHeight + 30, 280, RA8875_WHITE);
+	tft.drawFastHLine(0, voltagePos[yPos] + batteryHeight + 30, 280, RA8875_WHITE);
+}
+
 void printInt(const uint16_t& x,
 	const uint16_t& y,
 	const uint16_t& value,
@@ -215,6 +225,20 @@ void printFloat(
 	bool warning) {
 
 	sprintf(charValue, "%.01f", value);
+	prevValue = value;
+	printValue(x, y, charValue, fontSize, warning);
+}
+
+void printFloatNoPoint(
+	const uint16_t& x,
+	const uint16_t& y,
+	const float& value,
+	float& prevValue,
+	char* charValue,
+	const uint8_t& fontSize,
+	bool warning) {
+
+	sprintf(charValue, "%d", (int)value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -254,7 +278,7 @@ void printValues() {
 		}
 		if (prevOilTemp != oilTemp) {
 			if (oilTemp > 250) {
-				printFloat(
+				printFloatNoPoint(
 					oilTempPos[xPos], 
 					oilTempPos[yPos], 
 					oilTemp, 
@@ -265,7 +289,7 @@ void printValues() {
 				);
 			}
 			else {
-				printFloat(
+				printFloatNoPoint(
 					oilTempPos[xPos], 
 					oilTempPos[yPos], 
 					oilTemp, 
@@ -275,11 +299,12 @@ void printValues() {
 					false
 				);
 			}
+			tft.textEnlarge(2);
 			tft.textWrite(celcius);
 		}
 		if (prevWaterTemp != waterTemp) {
 			if (waterTemp > 250) {
-				printFloat(
+				printFloatNoPoint(
 					waterTempPos[xPos], 
 					waterTempPos[yPos], 
 					waterTemp, 
@@ -290,7 +315,7 @@ void printValues() {
 				);
 			}
 			else {
-				printFloat(
+				printFloatNoPoint(
 					waterTempPos[xPos], 
 					waterTempPos[yPos], 
 					waterTemp, 
@@ -300,6 +325,7 @@ void printValues() {
 					false
 				);
 			}
+			tft.textEnlarge(2);
 			tft.textWrite(celcius);
 		}
 		if (prevBrakeTemp != brakeTemp) {
@@ -325,6 +351,7 @@ void printValues() {
 					false
 				);
 			}
+			tft.textEnlarge(2);
 			tft.textWrite(celcius);
 		}
 		tempTimer = 0;
@@ -558,6 +585,7 @@ void setup() {
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	printIcons();
 	printLabels();
+	printFrames();
 	printValues();
 }
 
@@ -565,6 +593,7 @@ void loop() {
 
 	printValues();
 	runShiftRegister();
+
 	/*
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
