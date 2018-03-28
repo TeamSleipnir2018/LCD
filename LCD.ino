@@ -211,6 +211,20 @@ void printFloatNoPoint(
 	printValue(x, y, charValue, fontSize, warning);
 }
 
+void printFloatNoPoint(
+	const uint16_t& x,
+	const uint16_t& y,
+	const float& value,
+	float& prevValue,
+	char* charValue,
+	const uint8_t& fontSize,
+	bool warning) {
+
+	sprintf(charValue, "%d", (int)value);
+	prevValue = value;
+	printValue(x, y, charValue, fontSize, warning);
+}
+
 void printValue(
 	const uint16_t& x,
 	const uint16_t& y,
