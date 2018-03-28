@@ -62,7 +62,6 @@ char gearDisp;
 uint16_t speed;
 uint16_t prevSpeed;
 char speedDisp[3];
-uint16_t speedCount;
 
 float voltage;
 float prevVoltage;
@@ -78,7 +77,7 @@ uint8_t srWarningCounter;
 uint8_t srLedCounter;
 
 bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
-
+	Serial.println(frame.id);
 	switch (frame.id) {
 	case 1:
 		rpm = frame.buf[0] | (frame.buf[1] << 8);
@@ -104,37 +103,6 @@ int cX;
 int cY;
 uint16_t speedoRadius;
 */
-
-
-void demo() {
-	if (rpm != MAX_RPM) {
-		rpm += 25;
-	}
-	else {
-		oilTemp = random(110, 150);
-		waterTemp = random(110, 150);
-		brakeTemp = random(110, 150);
-		
-		if (gear < 6) {
-			gear++;
-			rpm = 2000;
-		}
-		else {
-			rpm = 13500;
-		}
-	}
-
-	if (speed < 255 && gear != 0) {
-		if (speedCount == 5) {
-			speed++;
-			speedCount = 0;
-		}
-		else {
-			speedCount++;
-		}
-	}
-}
-
 
 void printIcons() {
 	tft.graphicsMode();
@@ -210,7 +178,7 @@ void printInt(const uint16_t& x,
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%d", value);
+	sprintf(charValue, "%*d", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -224,7 +192,7 @@ void printFloat(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%.01f", value);
+	sprintf(charValue, "%*.01f", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -238,7 +206,7 @@ void printFloatNoPoint(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%d", (int)value);
+	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -250,6 +218,7 @@ void printValue(
 	const uint8_t& fontSize,
 	bool warning
 	) {
+	tft.textMode();
 	tft.textSetCursor(x, y);
 	tft.textEnlarge(fontSize);
 	if (warning) {
