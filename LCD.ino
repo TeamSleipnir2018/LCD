@@ -392,7 +392,11 @@ void printInt(const uint16_t& x,
 	bool warning) {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), value);
+=======
+	sprintf(charValue, "% *d", sizeof(charValue), value);
+>>>>>>> Removed unwanted merge leftovers
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -406,7 +410,7 @@ void printFloat(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*.01f", sizeof(charValue), value);
+	sprintf(charValue, "% *.01f", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -420,6 +424,7 @@ void printFloatNoPoint(
 	const uint8_t& fontSize,
 	bool warning) {
 
+<<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
@@ -438,6 +443,9 @@ void printFloatNoPoint(
 =======
 	sprintf(charValue, "%d", value);
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
+=======
+	sprintf(charValue, "% *d", sizeof(charValue), (int)value);
+>>>>>>> Removed unwanted merge leftovers
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
