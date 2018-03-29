@@ -178,7 +178,7 @@ void printInt(const uint16_t& x,
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*d", sizeof(charValue), value);
+	sprintf(charValue, "% *d", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -192,7 +192,7 @@ void printFloat(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*.01f", sizeof(charValue), value);
+	sprintf(charValue, "% *.01f", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -206,21 +206,7 @@ void printFloatNoPoint(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
-	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
-}
-
-void printFloatNoPoint(
-	const uint16_t& x,
-	const uint16_t& y,
-	const float& value,
-	float& prevValue,
-	char* charValue,
-	const uint8_t& fontSize,
-	bool warning) {
-
-	sprintf(charValue, "%d", (int)value);
+	sprintf(charValue, "% *d", sizeof(charValue), (int)value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
