@@ -9,8 +9,12 @@
     <ClInclude Include="images\oilTempIcon.h" />
     <ClInclude Include="images\waterTempIcon.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
 </Project>
