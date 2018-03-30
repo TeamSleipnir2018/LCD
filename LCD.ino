@@ -6,12 +6,12 @@ Hardware:
 	- Adafruit RA8875 touch LCD controller
 	- 800 x 480 LCD
 	- NPIC6C4894 shift registers
+	- MCP2551 CAN transceiver
 
 Written by Einar Arnason
 ******************************************************************/
 
 #include <FlexCAN.h>
-#include <Metro.h>
 #include <SPI.h>
 #include <stdint.h>
 #include <Adafruit_GFX.h>
@@ -27,6 +27,7 @@ Written by Einar Arnason
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
 #include "constants.h"
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 #include "logo.h"
@@ -45,6 +46,9 @@ const uint8_t SR_LATCH = 14;
 >>>>>>> Fixing some conflicts
 =======
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
+=======
+#include "Vehicle.h"
+>>>>>>> Refactored code and redesigned speedometer
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
@@ -80,6 +84,7 @@ CanListener canListener;
 unsigned int txTimer, rxTimer;
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
 
+<<<<<<< HEAD
 // Vehicle values
 uint16_t rpm;
 uint16_t prevRPM;
@@ -135,6 +140,10 @@ char voltageDisp[8];
 
 bool fanOn;
 bool prevFanOn;
+=======
+// Vehicle class instance
+Vehicle vehicle;
+>>>>>>> Refactored code and redesigned speedometer
 
 <<<<<<< HEAD
 // Shift register variables
@@ -196,23 +205,25 @@ uint8_t srWarningCounter;
 uint8_t srLedCounter;
 
 bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
-	Serial.println(frame.id);
+	
 	switch (frame.id) {
 	case 1:
-		rpm = frame.buf[0] | (frame.buf[1] << 8);
-		voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
-		waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
-		speed = frame.buf[6] | (frame.buf[7] << 8);
+		vehicle.rpm = frame.buf[0] | (frame.buf[1] << 8);
+		Serial.println(vehicle.rpm);
+		vehicle.voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
+		vehicle.waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
+		vehicle.speed = frame.buf[6] | (frame.buf[7] << 8);
 		break;
 	case 2:
-		oilTemp = CANKelvinToFloat(frame.buf[0] | (frame.buf[1] << 8));
-		gear = frame.buf[2] | (frame.buf[3] << 8);
+		vehicle.oilTemp = CANKelvinToFloat(frame.buf[0] | (frame.buf[1] << 8));
+		vehicle.gear = frame.buf[2] | (frame.buf[3] << 8);
 		break;
 	}
 
 	return true;
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> Added icons, calibrated ECU values, moved constants to another file
 // Timers
@@ -314,6 +325,8 @@ void demo() {
 }
 */
 
+=======
+>>>>>>> Refactored code and redesigned speedometer
 void printIcons() {
 	tft.graphicsMode();
 	// Draw the icon for cooling fan
@@ -325,6 +338,7 @@ void printIcons() {
 		fanHeight, 
 		RA8875_WHITE
 	);
+	// Draw battery icon
 	tft.drawXBitmap(
 		batteryIconPos[xPos], 
 		batteryIconPos[yPos], 
@@ -333,7 +347,7 @@ void printIcons() {
 		batteryHeight, 
 		RA8875_WHITE
 	);
-	//drawFanDisabled();
+	// Draw engine oil temperature icon
 	tft.drawXBitmap(
 		oilLabelPos[xPos], 
 		oilLabelPos[yPos], 
@@ -342,6 +356,7 @@ void printIcons() {
 		oilTempHeight, 
 		RA8875_WHITE
 	);
+	// Draw coolant temperature icon
 	tft.drawXBitmap(
 		waterLabelPos[xPos],
 		waterLabelPos[yPos],
@@ -350,6 +365,7 @@ void printIcons() {
 		waterTempHeight,
 		RA8875_WHITE
 	);
+	// Draw brake temperature icon
 	tft.drawXBitmap(
 		brakesLabelPos[xPos],
 		brakesLabelPos[yPos],
@@ -393,10 +409,14 @@ void printInt(const uint16_t& x,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), value);
 =======
 	sprintf(charValue, "% *d", sizeof(charValue), value);
 >>>>>>> Removed unwanted merge leftovers
+=======
+	sprintf(charValue, "%*d", sizeof(charValue), value);
+>>>>>>> Refactored code and redesigned speedometer
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -410,7 +430,7 @@ void printFloat(
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "% *.01f", sizeof(charValue), value);
+	sprintf(charValue, "%*.01f", sizeof(charValue), value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -424,6 +444,7 @@ void printFloatNoPoint(
 	const uint8_t& fontSize,
 	bool warning) {
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
 	prevValue = value;
@@ -446,6 +467,9 @@ void printFloatNoPoint(
 =======
 	sprintf(charValue, "% *d", sizeof(charValue), (int)value);
 >>>>>>> Removed unwanted merge leftovers
+=======
+	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
+>>>>>>> Refactored code and redesigned speedometer
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -491,19 +515,42 @@ void printValue(
 }
 
 void printValues() {
-	//if (tempTimer == 0) {
-		if (voltage != prevVoltage) {
-			printFloat(
-				voltagePos[xPos],
-				voltagePos[yPos],
-				voltage,
-				prevVoltage,
-				voltageDisp,
-				3,
+	if (vehicle.voltage != vehicle.prevVoltage) {
+		printFloat(
+			voltagePos[xPos],
+			voltagePos[yPos],
+			vehicle.voltage,
+			vehicle.prevVoltage,
+			vehicle.voltageDisp,
+			3,
+			false
+		);
+		tft.textWrite("v");
+	}
+	if (vehicle.prevOilTemp != vehicle.oilTemp) {
+		if (vehicle.oilTemp > 250) {
+			printFloatNoPoint(
+				oilTempPos[xPos], 
+				oilTempPos[yPos], 
+				vehicle.oilTemp,
+				vehicle.prevOilTemp,
+				vehicle.oilTempDisp,
+				3, 
+				true
+			);
+		}
+		else {
+			printFloatNoPoint(
+				oilTempPos[xPos], 
+				oilTempPos[yPos], 
+				vehicle.oilTemp,
+				vehicle.prevOilTemp,
+				vehicle.oilTempDisp,
+				3, 
 				false
 			);
-			tft.textWrite("v");
 		}
+<<<<<<< HEAD
 		if (prevOilTemp != oilTemp) {
 			if (oilTemp > 250) {
 <<<<<<< HEAD
@@ -571,131 +618,120 @@ void printValues() {
 			}
 			tft.textEnlarge(2);
 			tft.textWrite(celcius);
+=======
+		tft.textEnlarge(2);
+		tft.textWrite(celcius);
+	}
+	if (vehicle.prevWaterTemp != vehicle.waterTemp) {
+		if (vehicle.waterTemp > 250) {
+			printFloatNoPoint(
+				waterTempPos[xPos], 
+				waterTempPos[yPos], 
+				vehicle.waterTemp,
+				vehicle.prevWaterTemp,
+				vehicle.waterTempDisp,
+				3, 
+				true
+			);
 		}
-		if (prevBrakeTemp != brakeTemp) {
-			if (brakeTemp > 250) {
-				printInt(
-					brakesTempPos[xPos], 
-					brakesTempPos[yPos], 
-					brakeTemp, 
-					prevBrakeTemp, 
-					brakeTempDisp, 
-					3, 
-					true
-				);
-			}
-			else {
-				printInt(
-					brakesTempPos[xPos], 
-					brakesTempPos[yPos], 
-					brakeTemp, 
-					prevBrakeTemp, 
-					brakeTempDisp, 
-					3, 
-					false
-				);
-			}
-			tft.textEnlarge(2);
-			tft.textWrite(celcius);
+		else {
+			printFloatNoPoint(
+				waterTempPos[xPos], 
+				waterTempPos[yPos], 
+				vehicle.waterTemp,
+				vehicle.prevWaterTemp,
+				vehicle.waterTempDisp,
+				3, 
+				false
+			);
+>>>>>>> Refactored code and redesigned speedometer
 		}
-		tempTimer = 0;
-	/*}
-	else {
-		tempTimer++;
-	}*/
-	if (prevRPM != rpm) {
-		if (rpm > MAX_RPM - 500) {
+		tft.textEnlarge(2);
+		tft.textWrite(celcius);
+	}
+	if (vehicle.prevBrakeTemp != vehicle.brakeTemp) {
+		if (vehicle.brakeTemp > 250) {
 			printInt(
-				rpmPos[xPos], 
-				rpmPos[yPos], 
-				rpm, 
-				prevRPM, 
-				rpmDisp, 
+				brakesTempPos[xPos], 
+				brakesTempPos[yPos], 
+				vehicle.brakeTemp,
+				vehicle.prevBrakeTemp,
+				vehicle.brakeTempDisp,
 				3, 
 				true
 			);
 		}
 		else {
 			printInt(
+				brakesTempPos[xPos], 
+				brakesTempPos[yPos], 
+				vehicle.brakeTemp,
+				vehicle.prevBrakeTemp,
+				vehicle.brakeTempDisp,
+				3, 
+				false
+			);
+		}
+		tft.textEnlarge(2);
+		tft.textWrite(celcius);
+	}
+	if (vehicle.prevRPM != vehicle.rpm) {
+		if (vehicle.rpm > MAX_RPM - 500) {
+			printInt(
 				rpmPos[xPos], 
 				rpmPos[yPos], 
-				rpm, 
-				prevRPM, 
-				rpmDisp, 
+				vehicle.rpm,
+				vehicle.prevRPM,
+				vehicle.rpmDisp,
+				3, 
+				false
+			);
+		}
+		else {
+			printInt(
+				rpmPos[xPos], 
+				rpmPos[yPos], 
+				vehicle.rpm,
+				vehicle.prevRPM,
+				vehicle.rpmDisp,
 				3, 
 				false
 			);
 		}
 	}
-	if (prevSpeed != speed) {
+	if (vehicle.prevSpeed != vehicle.speed) {
 		
-		//drawSpeedLine(prevSpeed, 0x0000);
-		//drawSpeedLine(speed, RA8875_RED);
-		
+		if (vehicle.speed > vehicle.prevSpeed) {
+			for (int i = vehicle.prevSpeed; i < vehicle.speed; i++) {
+				drawSpeedLine(i, RA8875_RED);
+			}
+		}
+		else {
+			for (int i = vehicle.prevSpeed; i >= vehicle.speed; i--) {
+				drawSpeedLine(i, RA8875_BLACK);
+			}
+		}
+
 		printInt(
 			speedPos[xPos], 
 			speedPos[yPos], 
-			speed, 
-			prevSpeed, 
-			speedDisp, 
+			vehicle.speed,
+			vehicle.prevSpeed,
+			vehicle.speedDisp,
 			3, 
 			false
 		);
-		switch (speed) {
-		case 18 :
-			tft.fillRect(500, 210, 18, 30, 0xffff);
-			break;
-		case 36 :
-			tft.fillRect(520, 200, 18, 35, 0xf877);
-			break;
-		case 54 :
-			tft.fillRect(540, 190, 18, 40, 0xf866);
-			break;
-		case 72 :
-			tft.fillRect(560, 180, 18, 45, 0xf855);
-			break;
-		case 90 :
-			tft.fillRect(580, 170, 18, 50, 0xf844);
-			break;
-		case 108 :
-			tft.fillRect(600, 165, 18, 55, 0xf833);
-			break;
-		case 126 :
-			tft.fillRect(620, 160, 18, 60, 0xf822);
-			break;
-		case 144 :
-			tft.fillRect(640, 155, 18, 65, 0xf811);
-			break;
-		case 162 :
-			tft.fillRect(660, 150, 18, 75, 0xf800);
-			break;
-		case 180:
-			tft.fillRect(680, 145, 18, 80, 0xf800);
-			break;
-		case 198:
-			tft.fillRect(700, 140, 18, 85, 0xf800);
-			break;
-		case 216:
-			tft.fillRect(720, 135, 18, 90, 0xf800);
-			break;
-		case 234:
-			tft.fillRect(740, 130, 18, 95, 0xf800);
-			break;
-		case 252:
-			tft.fillRect(760, 125, 18, 100, 0xf800);
-			break;
-		}
-		prevSpeed = speed;
+		vehicle.prevSpeed = vehicle.speed;
 	}
-	if (prevGear != gear) {
-		if (gear == 0) {
+	if (vehicle.prevGear != vehicle.gear) {
+		if (vehicle.gear == 0) {
 			tft.drawChar(gearPos[xPos], gearPos[yPos], 'N', 0xffff, 0x0000, gearSize);
-			prevGear = gear;
+			vehicle.prevGear = vehicle.gear;
 		}
 		else {
-			gearDisp = 48 + gear;
-			prevGear = gear;
-			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, gearSize);
+			vehicle.gearDisp = 48 + vehicle.gear;
+			vehicle.prevGear = vehicle.gear;
+			tft.drawChar(gearPos[xPos], gearPos[yPos], vehicle.gearDisp, 0xffff, 0x0000, gearSize);
 		}
 	}
 }
@@ -705,21 +741,21 @@ void drawFanDisabled() {
 	tft.drawLine(225, 10, 251, 36, RA8875_RED);
 }
 
-/*
 // Draws the line in a circular speedometer
 void drawSpeedLine(const uint8_t& value, const uint16_t& color) {
-	int speedToDeg = 315 - value;
-	int u = (speedoRadius * sin(speedToDeg * (PI / 180))) + cX;
-	int v = (speedoRadius * cos(speedToDeg * (PI / 180))) + cY;
-	tft.drawLine(cX, cY, u, v, color);
+	int speedToDeg = 280 - value;
+	int u0 = (speedoOffsetRadius * sin(speedToDeg * (PI / 180))) + cX;
+	int v0 = (speedoOffsetRadius * cos(speedToDeg * (PI / 180))) + cY;
+	int u1 = ((speedoBarRadius + speedoOffsetRadius) * sin(speedToDeg * (PI / 180))) + cX;
+	int v1 = ((speedoBarRadius + speedoOffsetRadius) * cos(speedToDeg * (PI / 180))) + cY;
+	tft.drawLine(u0, v0, u1, v1, color);
 }
-*/
 
 void runShiftRegister() {
 	// Close the latch to write into register memory
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
-	ledBarSetBits = rpm / RPM_SCALE;
+	ledBarSetBits = vehicle.rpm / RPM_SCALE;
 	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
@@ -860,6 +896,7 @@ void setup() {
 	pinMode(RA8875_INT, INPUT);
 	digitalWrite(RA8875_INT, HIGH);
 	tft.touchEnable(true);
+<<<<<<< HEAD
 
 	// Initialize car values
 	rpm = 0;
@@ -898,6 +935,9 @@ void setup() {
 	// Initialize timers
 	tempTimer = 0;
 
+=======
+	
+>>>>>>> Refactored code and redesigned speedometer
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
 	tft.textMode();
@@ -916,6 +956,7 @@ void loop() {
 	/*
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 	demo();
@@ -926,6 +967,8 @@ void loop() {
 	runShiftRegister();
 >>>>>>> Fixing some conflicts
 
+=======
+>>>>>>> Refactored code and redesigned speedometer
 	
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
@@ -953,6 +996,7 @@ void loop() {
 		}
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 	
 =======
 	/*
@@ -960,5 +1004,7 @@ void loop() {
 	if (gear == 6 && rpm == 14000 && tempTimer == 255) {
 		setup();
 	}
+=======
+>>>>>>> Refactored code and redesigned speedometer
 	*/
 }

@@ -1,4 +1,5 @@
 .vs/
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -139,3 +140,8 @@ __vm/
 # vscode arduino extension
 .vscode/
 >>>>>>> Fixed merge conflict
+=======
+__vm/
+Debug/
+.vscode/
+>>>>>>> Refactored code and redesigned speedometer
