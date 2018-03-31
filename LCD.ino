@@ -16,10 +16,6 @@ Written by Einar Arnason
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_RA8875.h>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 #include "./images/logo.h"
 #include "./images/fanIcon.h"
 #include "./images/brakeTempIcon.h"
@@ -27,178 +23,26 @@ Written by Einar Arnason
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
 #include "constants.h"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-#include "logo.h"
-#include "fanIcon.h"
-#include "CanListener.h"
-
-// Pin assignment
-// LCD
-const uint8_t RA8875_INT = 2;
-const uint8_t RA8875_CS = 10;
-const uint8_t RA8875_RESET = 9;
-// Shift register
-const uint8_t SR_CLOCK_OUT = 16;
-const uint8_t SR_DATA_OUT = 15;
-const uint8_t SR_LATCH = 14;
->>>>>>> Fixing some conflicts
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-=======
 #include "Vehicle.h"
->>>>>>> Refactored code and redesigned speedometer
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 uint16_t tx, ty;
 
 // CAN BUS driver
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 class CanListener : public CANListener {
 public:
 	//overrides the parent version
 	bool frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller);
 };
-<<<<<<< HEAD
-=======
-
->>>>>>> Fixing some conflicts
 
 CanListener canListener;
 unsigned int txTimer, rxTimer;
-<<<<<<< HEAD
-=======
-// Translate float values from CAN BUS
-inline float CANIntToFloat(uint16_t floatValue) {
-	return floatValue / 1000.0;
-}
->>>>>>> Merging
-=======
 
-CanListener canListener;
-unsigned int txTimer, rxTimer;
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-
-<<<<<<< HEAD
-// Vehicle values
-uint16_t rpm;
-uint16_t prevRPM;
-char rpmDisp[6];
-
-float oilTemp;
-float prevOilTemp;
-char oilTempDisp[8];
-
-float waterTemp;
-float prevWaterTemp;
-char waterTempDisp[8];
-
-uint16_t brakeTemp;
-uint16_t prevBrakeTemp;
-char brakeTempDisp[8];
-
-uint8_t gear;
-uint8_t prevGear;
-char gearDisp;
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-uint16_t speed;
-uint16_t prevSpeed;
-char speedDisp[3];
-
-float voltage;
-float prevVoltage;
-char voltageDisp[8];
-=======
-<<<<<<< HEAD
-uint8_t speed;
-uint8_t prevSpeed;
-char speedDisp[2];
-uint8_t speedCount;
-=======
-=======
->>>>>>> Merging
-uint16_t speed;
-uint16_t prevSpeed;
-char speedDisp[3];
-uint16_t speedCount;
-<<<<<<< HEAD
->>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
->>>>>>> Cleanup
-=======
->>>>>>> Merging
-
-float voltage;
-float prevVoltage;
-char voltageDisp[8];
-
-bool fanOn;
-bool prevFanOn;
-=======
 // Vehicle class instance
 Vehicle vehicle;
->>>>>>> Refactored code and redesigned speedometer
 
-<<<<<<< HEAD
 // Shift register variables
-=======
-bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
-
-	switch (frame.id) {
-	case 1:
-		rpm = frame.buf[0] | (frame.buf[1] << 8);
-		voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
-		waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
-		speed = frame.buf[6] | (frame.buf[7] << 8);
-		break;
-	case 2:
-		oilTemp = CANKelvinToFloat(frame.buf[0] | (frame.buf[1] << 8));
-		gear = frame.buf[2] | (frame.buf[3] << 8);
-		break;
-	}
-
-	return true;
-}
-
-<<<<<<< HEAD
-// LCD positioning
-const uint16_t lcdWidth = 800;
-const uint16_t lcdHeight = 480;
-const uint16_t logoPos[] = { ((lcdWidth - logoWidth) / 2), ((lcdHeight - logoHeight) / 2) };
-const bool xPos = 0;
-const bool yPos = 1;
-const uint16_t gearSize = 20;
-const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
-const uint16_t oilLabelPos[] = { 10, 10 };
-const uint16_t oilTempPos[] = { 10, 80};
-const uint16_t waterLabelPos[] = { 10, 160 };
-const uint16_t waterTempPos[] = { 10, 230 };
-const uint16_t brakesLabelPos[] = { 10, 300 };
-const uint16_t brakesTempPos[] = { 10, 380 };
-const uint16_t speedLabelPos[] = { 620, 240 };
-const uint16_t speedPos[] = { 520, 240 };
-const uint16_t rpmLabelPos[] = { 480, 380 };
-const uint16_t rpmPos[] = { 320, 380 };
-
-// Shift register values
-const uint8_t WARNING_LIGHT1 = 128;
-const uint8_t WARNING_LIGHT2 = 64;
-const uint8_t WARNING_LIGHT3 = 32;
-const uint8_t WARNING_LIGHT4 = 16;
-const uint8_t WARNING_LIGHT5 = 8;
-const uint8_t WARNING_LIGHT6 = 4;
-const uint8_t WARNING_LIGHT7 = 2;
-const uint8_t WARNING_LIGHT8 = 1;
-const uint8_t SR_LEDBITS = 40;
-const uint8_t SR_WARNINGBITS = 8;
-const uint16_t RPM_SCALE = 350;
->>>>>>> Fixing some conflicts
 uint8_t warningSetBits;
 uint8_t ledBarSetBits;
 uint8_t srWarningCounter;
@@ -223,110 +67,6 @@ bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t contro
 	return true;
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-// Timers
-uint8_t tempTimer;
-
-/*
-// Circular speedometer vector
-int cX;
-int cY;
-uint16_t speedoRadius;
-*/
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-void printIcons() {
-	tft.graphicsMode();
-	// Draw the icon for cooling fan
-	tft.drawXBitmap(
-		fanIconPos[xPos], 
-		fanIconPos[yPos], 
-		fanIcon, 
-		fanWidth, 
-		fanHeight, 
-		RA8875_WHITE
-	);
-	tft.drawXBitmap(
-		batteryIconPos[xPos], 
-		batteryIconPos[yPos], 
-		batteryIcon, 
-		batteryWidth, 
-		batteryHeight, 
-		RA8875_WHITE
-	);
-	//drawFanDisabled();
-	tft.drawXBitmap(
-		oilLabelPos[xPos], 
-		oilLabelPos[yPos], 
-		oilTempIcon, 
-		oilTempWidth, 
-		oilTempHeight, 
-		RA8875_WHITE
-	);
-	tft.drawXBitmap(
-		waterLabelPos[xPos],
-		waterLabelPos[yPos],
-		waterTempIcon,
-		waterTempWidth,
-		waterTempHeight,
-		RA8875_WHITE
-	);
-	tft.drawXBitmap(
-		brakesLabelPos[xPos],
-		brakesLabelPos[yPos],
-		brakeTempIcon,
-		brakeTempWidth,
-		brakeTempHeight,
-		RA8875_WHITE
-	);
-	tft.textMode();
-=======
-// Celcius symbol, b0 is a RA8875 specific value for ° symbol
-=======
-// Celcius symbol, b0 is a RA8875 specific value for ï¿½ symbol
->>>>>>> Fixing some conflicts
-const static char celcius[3] = { 0xb0, 0x43 };
-
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-/*
-void demo() {
-	if (rpm != MAX_RPM) {
-		rpm += 25;
-	}
-	else {
-		oilTemp = random(110, 150);
-		waterTemp = random(110, 150);
-		brakeTemp = random(110, 150);
-		
-		if (gear < 6) {
-			gear++;
-			rpm = 2000;
-		}
-		else {
-			rpm = 13500;
-		}
-	}
-
-	if (speed < 255 && gear != 0) {
-		if (speedCount == 5) {
-			speed++;
-			speedCount = 0;
-		}
-		else {
-			speedCount++;
-		}
-	}
->>>>>>> Merging
-}
-*/
-
-=======
->>>>>>> Refactored code and redesigned speedometer
 void printIcons() {
 	tft.graphicsMode();
 	// Draw the icon for cooling fan
@@ -386,7 +126,6 @@ void printLabels() {
 	tft.textWrite(" RPM");
 }
 
-<<<<<<< HEAD
 void printFrames() {
 	tft.drawFastVLine(280, 0, 480, RA8875_WHITE);
 	tft.drawFastVLine(500, 0, 480 - (480 - 350), RA8875_WHITE);
@@ -397,8 +136,6 @@ void printFrames() {
 	tft.drawFastHLine(0, voltagePos[yPos] + batteryHeight + 30, 280, RA8875_WHITE);
 }
 
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 void printInt(const uint16_t& x,
 	const uint16_t& y,
 	const uint16_t& value,
@@ -407,16 +144,7 @@ void printInt(const uint16_t& x,
 	const uint8_t& fontSize,
 	bool warning) {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), value);
-=======
-	sprintf(charValue, "% *d", sizeof(charValue), value);
->>>>>>> Removed unwanted merge leftovers
-=======
-	sprintf(charValue, "%*d", sizeof(charValue), value);
->>>>>>> Refactored code and redesigned speedometer
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
@@ -444,53 +172,11 @@ void printFloatNoPoint(
 	const uint8_t& fontSize,
 	bool warning) {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
 	prevValue = value;
 	printValue(x, y, charValue, fontSize, warning);
 }
 
-void printFloatNoPoint(
-	const uint16_t& x,
-	const uint16_t& y,
-	const float& value,
-	float& prevValue,
-	char* charValue,
-	const uint8_t& fontSize,
-	bool warning) {
-
-	sprintf(charValue, "%d", (int)value);
-=======
-	sprintf(charValue, "%d", value);
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-=======
-	sprintf(charValue, "% *d", sizeof(charValue), (int)value);
->>>>>>> Removed unwanted merge leftovers
-=======
-	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
->>>>>>> Refactored code and redesigned speedometer
-	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
-}
-
-<<<<<<< HEAD
-=======
-void printFloat(
-	const uint16_t& x,
-	const uint16_t& y,
-	const float& value,
-	float& prevValue,
-	char* charValue,
-	const uint8_t& fontSize,
-	bool warning) {
-
-	sprintf(charValue, "%.02f", value);
-	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
-}
-
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 void printValue(
 	const uint16_t& x,
 	const uint16_t& y,
@@ -498,10 +184,7 @@ void printValue(
 	const uint8_t& fontSize,
 	bool warning
 	) {
-<<<<<<< HEAD
 	tft.textMode();
-=======
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 	tft.textSetCursor(x, y);
 	tft.textEnlarge(fontSize);
 	if (warning) {
@@ -550,75 +233,6 @@ void printValues() {
 				false
 			);
 		}
-<<<<<<< HEAD
-		if (prevOilTemp != oilTemp) {
-			if (oilTemp > 250) {
-<<<<<<< HEAD
-				printFloatNoPoint(
-=======
-				printFloat(
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-					oilTempPos[xPos], 
-					oilTempPos[yPos], 
-					oilTemp, 
-					prevOilTemp, 
-					oilTempDisp, 
-					3, 
-					true
-				);
-			}
-			else {
-<<<<<<< HEAD
-				printFloatNoPoint(
-=======
-				printFloat(
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-					oilTempPos[xPos], 
-					oilTempPos[yPos], 
-					oilTemp, 
-					prevOilTemp, 
-					oilTempDisp, 
-					3, 
-					false
-				);
-			}
-			tft.textEnlarge(2);
-			tft.textWrite(celcius);
-		}
-		if (prevWaterTemp != waterTemp) {
-			if (waterTemp > 250) {
-<<<<<<< HEAD
-				printFloatNoPoint(
-=======
-				printFloat(
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-					waterTempPos[xPos], 
-					waterTempPos[yPos], 
-					waterTemp, 
-					prevWaterTemp, 
-					waterTempDisp, 
-					3, 
-					true
-				);
-			}
-			else {
-<<<<<<< HEAD
-				printFloatNoPoint(
-=======
-				printFloat(
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-					waterTempPos[xPos], 
-					waterTempPos[yPos], 
-					waterTemp, 
-					prevWaterTemp, 
-					waterTempDisp, 
-					3, 
-					false
-				);
-			}
-			tft.textEnlarge(2);
-			tft.textWrite(celcius);
-=======
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
 	}
@@ -644,7 +258,6 @@ void printValues() {
 				3, 
 				false
 			);
->>>>>>> Refactored code and redesigned speedometer
 		}
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
@@ -782,73 +395,6 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, HIGH);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-void listenOnCAN() {
-
-	/*
-	Todo: 
-	CAN BUS sends 4 uint16_t variables per block
-	variables are little-endian
-	float values need to by divided with 1000
-	use function CANIntToFloat()
-	*/
-
-
-	
-	/*
-	//example code
-	// service software timers based on Metro tick
-	if (sysTimer.check()) {
-		if (txTimer) {
-			--txTimer;
-		}
-		if (rxTimer) {
-			--rxTimer;
-		}
-	}
-
-	// if not time-delayed, read CAN messages and print 1st byte
-	if (!rxTimer) {
-		while (CANbus.read(rxmsg)) {
-			Serial.print(rxmsg.id);
-			//hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
-			Serial.write(rxmsg.buf[0]);
-			rxCount++;
-		}
-	}
-
-	// insert a time delay between transmissions
-	if (!txTimer) {
-		// if frames were received, print the count
-		if (rxCount) {
-			Serial.write('=');
-			Serial.print(rxCount);
-			rxCount = 0;
-		}
-		txTimer = 100;//milliseconds
-		msg.len = 8;
-		msg.id = 0x222;
-		for (int idx = 0; idx<8; ++idx) {
-			msg.buf[idx] = '0' + idx;
-		}
-		// send 6 at a time to force tx buffering
-		txCount = 6;
-		Serial.println(".");
-		while (txCount--) {
-			CANbus.write(msg);
-			msg.buf[0]++;
-		}
-		// time delay to force some rx data queue use
-		rxTimer = 3;//milliseconds
-	}
-	*/
-}
-
->>>>>>> Merging
-=======
->>>>>>> Fixing some conflicts
 void setup() {
 	Serial.begin(9600);
 	Serial.println("RA8875 start");
@@ -896,48 +442,7 @@ void setup() {
 	pinMode(RA8875_INT, INPUT);
 	digitalWrite(RA8875_INT, HIGH);
 	tft.touchEnable(true);
-<<<<<<< HEAD
-
-	// Initialize car values
-	rpm = 0;
-	prevRPM = 1;
-	oilTemp = 0.0;
-	prevOilTemp = 1.0;
-	waterTemp = 0.0;
-	prevWaterTemp = 1.0;
-	brakeTemp = 0;
-	prevBrakeTemp = 1;
-	gear = 0;
-	prevGear = 1;
-	speed = 0;
-	prevSpeed = 1;
-	fanOn = false;
-	prevFanOn = true;
-	voltage = 0.0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	prevVoltage = 1.0;
-=======
-	prevVoltage = 0.0;
->>>>>>> Fixing some conflicts
-=======
-	prevVoltage = 1.0;
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-
-	/*
-	// Initialize circular speedometer values
-	cX = 370;
-	cY = 110;
-	speedoRadius = 70;
-	speedCount = 0;
-	*/
-
-	// Initialize timers
-	tempTimer = 0;
-
-=======
 	
->>>>>>> Refactored code and redesigned speedometer
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
 	tft.textMode();
@@ -956,19 +461,6 @@ void loop() {
 	/*
 	float xScale = 1024.0F / tft.width();
 	float yScale = 1024.0F / tft.height();
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-	demo();
-=======
-	//demo();
-
-	printValues();
-	runShiftRegister();
->>>>>>> Fixing some conflicts
-
-=======
->>>>>>> Refactored code and redesigned speedometer
 	
 	// Wait around for touch events
 	if (digitalRead(RA8875_INT)) {
@@ -995,16 +487,5 @@ void loop() {
 			}
 		}
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
-=======
-	/*
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
-	if (gear == 6 && rpm == 14000 && tempTimer == 255) {
-		setup();
-	}
-=======
->>>>>>> Refactored code and redesigned speedometer
 	*/
 }

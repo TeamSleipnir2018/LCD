@@ -4,7 +4,6 @@
 	Pin assignment
 */
 // LCD
-<<<<<<< HEAD
 const uint8_t RA8875_INT = 8;
 const uint8_t RA8875_CS = 10;
 const uint8_t RA8875_RESET = 9;
@@ -13,17 +12,6 @@ const uint8_t SR_CLOCK_OUT = 17;
 const uint8_t SR_DATA_OUT = 18;
 const uint8_t SR_LATCH = 19;
 const uint8_t SR_OUTPUT_ENABLE = 16;
-=======
-const uint8_t RA8875_INT = 2;
-const uint8_t RA8875_CS = 10;
-const uint8_t RA8875_RESET = 9;
-// Shift register
-const uint8_t SR_CLOCK_OUT = 16;
-const uint8_t SR_DATA_OUT = 15;
-const uint8_t SR_LATCH = 14;
-
-const uint16_t MAX_RPM = 14000;
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 
 /*
 	Converters
@@ -48,7 +36,6 @@ const bool xPos = 0;
 const bool yPos = 1;
 const uint16_t gearSize = 20;
 const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
-<<<<<<< HEAD
 const uint16_t oilLabelPos[] = { 10, 15 };
 const uint16_t oilTempPos[] = { oilTempWidth + 30, 5 };
 const uint16_t waterLabelPos[] = { 10, 105 };
@@ -62,21 +49,6 @@ const uint16_t speedPos[] = { 570, 190 };
 const uint16_t rpmLabelPos[] = { 480, 380 };
 const uint16_t rpmPos[] = { 320, 380 };
 const uint16_t fanIconPos[] = { (lcdWidth / 2) - (fanWidth / 2), 10 };
-=======
-const uint16_t oilLabelPos[] = { 10, 10 };
-const uint16_t oilTempPos[] = { 10, 80 };
-const uint16_t waterLabelPos[] = { 10, 160 };
-const uint16_t waterTempPos[] = { 10, 230 };
-const uint16_t brakesLabelPos[] = { 10, 300 };
-const uint16_t brakesTempPos[] = { 10, 380 };
-const uint16_t speedLabelPos[] = { 620, 240 };
-const uint16_t speedPos[] = { 520, 240 };
-const uint16_t rpmLabelPos[] = { 480, 380 };
-const uint16_t rpmPos[] = { 320, 380 };
-const uint16_t batteryIconPos[] = { 550, 20, };
-const uint16_t voltagePos[] = { 600, 10, };
-const uint16_t fanIconPos[] = { 225, 10 };
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 
 // Circular speedometer vector
 int cX = 650;
@@ -96,16 +68,9 @@ const uint8_t WARNING_LIGHT8 = 1;
 const uint8_t SR_LEDBITS = 40;
 const uint8_t SR_WARNINGBITS = 8;
 const uint16_t RPM_SCALE = 350;
-<<<<<<< HEAD
 const uint8_t TOTAL_LEDS = 48;
 
 const uint16_t MAX_RPM = 14000;
-=======
-uint8_t warningSetBits;
-uint8_t ledBarSetBits;
-uint8_t srWarningCounter;
-uint8_t srLedCounter;
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
 
 // Celcius symbol
 const static char celcius[3] = { 0xb0, 0x43 };

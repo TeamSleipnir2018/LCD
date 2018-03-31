@@ -4780,19 +4780,11 @@
                 -1.200000,
                 -1.800000,
                 4.800000,
-<<<<<<< HEAD
                 3.000000,
                 -1.400000,
                 2.000000,
                 1.400000,
                 -0.600000,
-=======
-                2.600000,
-                -2.000000,
-                1.800000,
-                1.400000,
-                -0.800000,
->>>>>>> Fixing some conflicts
                 0.000000,
                 -2.000000,
                 1.400000,
@@ -4811,15 +4803,9 @@
                 -3.800000,
                 15.000000,
                 15.000000,
-<<<<<<< HEAD
                 15.000000,
                 15.000000,
                 10.600000,
-=======
-                6.200000,
-                11.200000,
-                10.000000,
->>>>>>> Fixing some conflicts
                 11.000000,
                 10.800000,
                 4.000000,
@@ -4842,11 +4828,7 @@
                 8.200000,
                 15.000000,
                 15.000000,
-<<<<<<< HEAD
                 14.200000,
-=======
-                13.800000,
->>>>>>> Fixing some conflicts
                 6.600000,
                 14.000000,
                 14.200000,
@@ -18416,18 +18398,8 @@
                 "const_zero",
                 "const_zero",
                 "const_zero",
-<<<<<<< HEAD
-<<<<<<< HEAD
                 "oiltemp",
                 "gear",
-=======
-                "oilpress",
-                "ecutemp",
->>>>>>> Fixing some conflicts
-=======
-                "oiltemp",
-                "gear",
->>>>>>> Added icons, calibrated ECU values, moved constants to another file
                 "airtemp",
                 "injangle1",
                 "enginespeed",
@@ -18513,13 +18485,8 @@
                 "Disabled",
                 "Disabled",
                 "Disabled",
-<<<<<<< HEAD
                 "100Hz",
                 "100Hz"
-=======
-                "2Hz",
-                "2Hz"
->>>>>>> Fixing some conflicts
               ]
             }
           ]

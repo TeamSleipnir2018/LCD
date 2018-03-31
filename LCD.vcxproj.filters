@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <ClInclude Include="__vm\.LCD.vsarduino.h" />
     <ClInclude Include="images\batteryIcon.h" />
     <ClInclude Include="images\brakeTempIcon.h" />
@@ -16,41 +14,7 @@
   <ItemGroup>
     <None Include="LCD.ino" />
   </ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cc59b03... Added Shift register support for LED bars
-=======
->>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
-=======
-    <None Include="LCD.ino" />
-=======
-    <ClInclude Include="__vm\.LCD.vsarduino.h" />
->>>>>>> Fixing some conflicts
-  </ItemGroup>
->>>>>>> Merging
-  <ItemGroup>
-    <None Include="LCD.ino" />
-  </ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 086a262... Enlarged gear font
-=======
->>>>>>> cc59b03... Added Shift register support for LED bars
-=======
->>>>>>> 0d966d39b1d0f694c7cdf1ac084a26e00ea884fc
->>>>>>> Cleanup
-=======
->>>>>>> Merging
-=======
   <ItemGroup>
     <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
->>>>>>> Refactored code and redesigned speedometer
 </Project>
