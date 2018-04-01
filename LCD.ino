@@ -53,7 +53,6 @@ bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t contro
 	switch (frame.id) {
 	case 1:
 		vehicle.rpm = frame.buf[0] | (frame.buf[1] << 8);
-		Serial.println(vehicle.rpm);
 		vehicle.voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
 		vehicle.waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
 		vehicle.speed = frame.buf[6] | (frame.buf[7] << 8);
@@ -140,13 +139,14 @@ void printInt(const uint16_t& x,
 	const uint16_t& y,
 	const uint16_t& value,
 	uint16_t& prevValue,
-	char* charValue,
+	char charValue[],
+	const uint8_t len,
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*d", sizeof(charValue), value);
+	sprintf(charValue, "%*d", len, value);
 	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
+	printValue(x, y, charValue, len, fontSize, warning);
 }
 
 void printFloat(
@@ -154,13 +154,14 @@ void printFloat(
 	const uint16_t& y,
 	const float& value,
 	float& prevValue,
-	char* charValue,
+	char charValue[],
+	const uint8_t& len,
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*.01f", sizeof(charValue), value);
+	sprintf(charValue, "%*.01f", len, value);
 	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
+	printValue(x, y, charValue, len, fontSize, warning);
 }
 
 void printFloatNoPoint(
@@ -168,19 +169,21 @@ void printFloatNoPoint(
 	const uint16_t& y,
 	const float& value,
 	float& prevValue,
-	char* charValue,
+	char charValue[],
+	const uint8_t& len,
 	const uint8_t& fontSize,
 	bool warning) {
 
-	sprintf(charValue, "%*d", sizeof(charValue), (int)value);
+	sprintf(charValue, "%*d", len, (int)value);
 	prevValue = value;
-	printValue(x, y, charValue, fontSize, warning);
+	printValue(x, y, charValue, len, fontSize, warning);
 }
 
 void printValue(
 	const uint16_t& x,
 	const uint16_t& y,
-	char* charValue, 
+	char charValue[],
+	const uint8_t& len,
 	const uint8_t& fontSize,
 	bool warning
 	) {
@@ -193,31 +196,35 @@ void printValue(
 	else {
 		tft.textColor(RA8875_WHITE, RA8875_BLACK);
 	}
-	tft.textWrite(charValue);
+	tft.textWrite(charValue, len);
 	tft.textColor(RA8875_WHITE, RA8875_BLACK);
 }
 
 void printValues() {
 	if (vehicle.voltage != vehicle.prevVoltage) {
+		char charValue[voltageDispLen];
 		printFloat(
 			voltagePos[xPos],
 			voltagePos[yPos],
 			vehicle.voltage,
 			vehicle.prevVoltage,
-			vehicle.voltageDisp,
+			charValue,
+			voltageDispLen,
 			3,
 			false
 		);
 		tft.textWrite("v");
 	}
 	if (vehicle.prevOilTemp != vehicle.oilTemp) {
+		char charValue[oilTempDispLen];
 		if (vehicle.oilTemp > 250) {
 			printFloatNoPoint(
 				oilTempPos[xPos], 
 				oilTempPos[yPos], 
 				vehicle.oilTemp,
 				vehicle.prevOilTemp,
-				vehicle.oilTempDisp,
+				charValue,
+				oilTempDispLen,
 				3, 
 				true
 			);
@@ -228,7 +235,8 @@ void printValues() {
 				oilTempPos[yPos], 
 				vehicle.oilTemp,
 				vehicle.prevOilTemp,
-				vehicle.oilTempDisp,
+				charValue,
+				oilTempDispLen,
 				3, 
 				false
 			);
@@ -237,13 +245,15 @@ void printValues() {
 		tft.textWrite(celcius);
 	}
 	if (vehicle.prevWaterTemp != vehicle.waterTemp) {
+		char charValue[waterTempDispLen];
 		if (vehicle.waterTemp > 250) {
 			printFloatNoPoint(
 				waterTempPos[xPos], 
 				waterTempPos[yPos], 
 				vehicle.waterTemp,
 				vehicle.prevWaterTemp,
-				vehicle.waterTempDisp,
+				charValue,
+				waterTempDispLen,
 				3, 
 				true
 			);
@@ -254,7 +264,8 @@ void printValues() {
 				waterTempPos[yPos], 
 				vehicle.waterTemp,
 				vehicle.prevWaterTemp,
-				vehicle.waterTempDisp,
+				charValue,
+				waterTempDispLen,
 				3, 
 				false
 			);
@@ -263,13 +274,16 @@ void printValues() {
 		tft.textWrite(celcius);
 	}
 	if (vehicle.prevBrakeTemp != vehicle.brakeTemp) {
+		char charValue[brakesTempDispLen];
 		if (vehicle.brakeTemp > 250) {
+			char charValue[brakesTempDispLen];
 			printInt(
 				brakesTempPos[xPos], 
 				brakesTempPos[yPos], 
 				vehicle.brakeTemp,
 				vehicle.prevBrakeTemp,
-				vehicle.brakeTempDisp,
+				charValue,
+				brakesTempDispLen,
 				3, 
 				true
 			);
@@ -280,7 +294,8 @@ void printValues() {
 				brakesTempPos[yPos], 
 				vehicle.brakeTemp,
 				vehicle.prevBrakeTemp,
-				vehicle.brakeTempDisp,
+				charValue,
+				brakesTempDispLen,
 				3, 
 				false
 			);
@@ -289,15 +304,17 @@ void printValues() {
 		tft.textWrite(celcius);
 	}
 	if (vehicle.prevRPM != vehicle.rpm) {
+		char charValue[rpmDispLen];
 		if (vehicle.rpm > MAX_RPM - 500) {
 			printInt(
 				rpmPos[xPos], 
 				rpmPos[yPos], 
 				vehicle.rpm,
 				vehicle.prevRPM,
-				vehicle.rpmDisp,
+				charValue,
+				rpmDispLen,
 				3, 
-				false
+				true
 			);
 		}
 		else {
@@ -306,17 +323,33 @@ void printValues() {
 				rpmPos[yPos], 
 				vehicle.rpm,
 				vehicle.prevRPM,
-				vehicle.rpmDisp,
+				charValue,
+				rpmDispLen,
 				3, 
 				false
 			);
 		}
 	}
 	if (vehicle.prevSpeed != vehicle.speed) {
-		
+		char charValue[speedDispLen];
 		if (vehicle.speed > vehicle.prevSpeed) {
 			for (int i = vehicle.prevSpeed; i < vehicle.speed; i++) {
-				drawSpeedLine(i, RA8875_RED);
+
+				uint8_t red;
+				uint8_t green;
+
+				if (i <= 100) {
+					green = 255;
+					red = i * 2.55;
+				}
+				else {
+					red = 255;
+					green = 255 - ((i - 100) * 2.55);
+				}
+
+				Serial.println((uint16_t)((red << 11) | (green << 5)), HEX);
+				
+				drawSpeedLine(i, (red << 11) | (green << 5));
 			}
 		}
 		else {
@@ -330,7 +363,8 @@ void printValues() {
 			speedPos[yPos], 
 			vehicle.speed,
 			vehicle.prevSpeed,
-			vehicle.speedDisp,
+			charValue,
+			speedDispLen,
 			3, 
 			false
 		);
@@ -342,9 +376,9 @@ void printValues() {
 			vehicle.prevGear = vehicle.gear;
 		}
 		else {
-			vehicle.gearDisp = 48 + vehicle.gear;
+			char gearDisp = 48 + vehicle.gear;
 			vehicle.prevGear = vehicle.gear;
-			tft.drawChar(gearPos[xPos], gearPos[yPos], vehicle.gearDisp, 0xffff, 0x0000, gearSize);
+			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, gearSize);
 		}
 	}
 }

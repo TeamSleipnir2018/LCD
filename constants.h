@@ -38,16 +38,22 @@ const uint16_t gearSize = 20;
 const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
 const uint16_t oilLabelPos[] = { 10, 15 };
 const uint16_t oilTempPos[] = { oilTempWidth + 30, 5 };
+const uint8_t oilTempDispLen = 4;
 const uint16_t waterLabelPos[] = { 10, 105 };
 const uint16_t waterTempPos[] = { waterTempWidth + 30, 100 };
+const uint8_t waterTempDispLen = 4;
 const uint16_t brakesLabelPos[] = { 10, 200 };
 const uint16_t brakesTempPos[] = { brakeTempWidth + 30, 190 };
+const uint8_t brakesTempDispLen = 4;
 const uint16_t batteryIconPos[] = { 10, 295, };
 const uint16_t voltagePos[] = { batteryWidth + 30, 285 };
+const uint8_t voltageDispLen = 5;
 const uint16_t speedLabelPos[] = { 580, 240 };
-const uint16_t speedPos[] = { 570, 190 };
+const uint16_t speedPos[] = { 590, 190 };
+const uint8_t speedDispLen = 3;
 const uint16_t rpmLabelPos[] = { 480, 380 };
 const uint16_t rpmPos[] = { 320, 380 };
+const uint8_t rpmDispLen = 5;
 const uint16_t fanIconPos[] = { (lcdWidth / 2) - (fanWidth / 2), 10 };
 
 // Circular speedometer vector
