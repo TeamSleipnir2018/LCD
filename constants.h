@@ -13,21 +13,6 @@ const uint8_t SR_DATA_OUT = 18;
 const uint8_t SR_LATCH = 19;
 const uint8_t SR_OUTPUT_ENABLE = 16;
 
-/*
-	Converters
-*/
-// Translate float values from CAN BUS
-inline float CANIntToFloat(uint16_t floatValue) {
-	return floatValue / 1000.0;
-}
-// Translate kelvin temperature values from CAN BUS
-inline float CANKelvinToFloat(uint16_t kelvinValue) {
-	float result = kelvinValue / 10.0;
-	result = result - 273.15;
-
-	return result;
-}
-
 // LCD positioning
 const uint16_t lcdWidth = 800;
 const uint16_t lcdHeight = 480;

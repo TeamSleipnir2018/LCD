@@ -11,7 +11,6 @@ Hardware:
 Written by Einar Arnason
 ******************************************************************/
 
-#include <FlexCAN.h>
 #include <SPI.h>
 #include <stdint.h>
 #include <Adafruit_GFX.h>
@@ -23,48 +22,20 @@ Written by Einar Arnason
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
 #include "constants.h"
-#include "Vehicle.h"
+#include "CanListener.h"
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
-uint16_t tx, ty;
+//uint16_t tx, ty;
 
 // CAN BUS driver
-class CanListener : public CANListener {
-public:
-	//overrides the parent version
-	bool frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller);
-};
-
 CanListener canListener;
-unsigned int txTimer, rxTimer;
-
-// Vehicle class instance
-Vehicle vehicle;
 
 // Shift register variables
 uint8_t warningSetBits;
 uint8_t ledBarSetBits;
 uint8_t srWarningCounter;
 uint8_t srLedCounter;
-
-bool CanListener::frameHandler(CAN_message_t &frame, int mailbox, uint8_t controller) {
-	
-	switch (frame.id) {
-	case 1:
-		vehicle.rpm = frame.buf[0] | (frame.buf[1] << 8);
-		vehicle.voltage = CANIntToFloat(frame.buf[2] | (frame.buf[3] << 8));
-		vehicle.waterTemp = CANKelvinToFloat(frame.buf[4] | (frame.buf[5] << 8));
-		vehicle.speed = frame.buf[6] | (frame.buf[7] << 8);
-		break;
-	case 2:
-		vehicle.oilTemp = CANKelvinToFloat(frame.buf[0] | (frame.buf[1] << 8));
-		vehicle.gear = frame.buf[2] | (frame.buf[3] << 8);
-		break;
-	}
-
-	return true;
-}
 
 void printIcons() {
 	tft.graphicsMode();
@@ -201,13 +172,13 @@ void printValue(
 }
 
 void printValues() {
-	if (vehicle.voltage != vehicle.prevVoltage) {
+	if (canListener.vehicle.voltage != canListener.vehicle.prevVoltage) {
 		char charValue[voltageDispLen];
 		printFloat(
 			voltagePos[xPos],
 			voltagePos[yPos],
-			vehicle.voltage,
-			vehicle.prevVoltage,
+			canListener.vehicle.voltage,
+			canListener.vehicle.prevVoltage,
 			charValue,
 			voltageDispLen,
 			3,
@@ -215,14 +186,14 @@ void printValues() {
 		);
 		tft.textWrite("v");
 	}
-	if (vehicle.prevOilTemp != vehicle.oilTemp) {
+	if (canListener.vehicle.prevOilTemp != canListener.vehicle.oilTemp) {
 		char charValue[oilTempDispLen];
-		if (vehicle.oilTemp > 250) {
+		if (canListener.vehicle.oilTemp > 250) {
 			printFloatNoPoint(
 				oilTempPos[xPos], 
 				oilTempPos[yPos], 
-				vehicle.oilTemp,
-				vehicle.prevOilTemp,
+				canListener.vehicle.oilTemp,
+				canListener.vehicle.prevOilTemp,
 				charValue,
 				oilTempDispLen,
 				3, 
@@ -233,8 +204,8 @@ void printValues() {
 			printFloatNoPoint(
 				oilTempPos[xPos], 
 				oilTempPos[yPos], 
-				vehicle.oilTemp,
-				vehicle.prevOilTemp,
+				canListener.vehicle.oilTemp,
+				canListener.vehicle.prevOilTemp,
 				charValue,
 				oilTempDispLen,
 				3, 
@@ -244,14 +215,14 @@ void printValues() {
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
 	}
-	if (vehicle.prevWaterTemp != vehicle.waterTemp) {
+	if (canListener.vehicle.prevWaterTemp != canListener.vehicle.waterTemp) {
 		char charValue[waterTempDispLen];
-		if (vehicle.waterTemp > 250) {
+		if (canListener.vehicle.waterTemp > 250) {
 			printFloatNoPoint(
 				waterTempPos[xPos], 
 				waterTempPos[yPos], 
-				vehicle.waterTemp,
-				vehicle.prevWaterTemp,
+				canListener.vehicle.waterTemp,
+				canListener.vehicle.prevWaterTemp,
 				charValue,
 				waterTempDispLen,
 				3, 
@@ -262,8 +233,8 @@ void printValues() {
 			printFloatNoPoint(
 				waterTempPos[xPos], 
 				waterTempPos[yPos], 
-				vehicle.waterTemp,
-				vehicle.prevWaterTemp,
+				canListener.vehicle.waterTemp,
+				canListener.vehicle.prevWaterTemp,
 				charValue,
 				waterTempDispLen,
 				3, 
@@ -273,15 +244,15 @@ void printValues() {
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
 	}
-	if (vehicle.prevBrakeTemp != vehicle.brakeTemp) {
+	if (canListener.vehicle.prevBrakeTemp != canListener.vehicle.brakeTemp) {
 		char charValue[brakesTempDispLen];
-		if (vehicle.brakeTemp > 250) {
+		if (canListener.vehicle.brakeTemp > 250) {
 			char charValue[brakesTempDispLen];
 			printInt(
 				brakesTempPos[xPos], 
 				brakesTempPos[yPos], 
-				vehicle.brakeTemp,
-				vehicle.prevBrakeTemp,
+				canListener.vehicle.brakeTemp,
+				canListener.vehicle.prevBrakeTemp,
 				charValue,
 				brakesTempDispLen,
 				3, 
@@ -292,8 +263,8 @@ void printValues() {
 			printInt(
 				brakesTempPos[xPos], 
 				brakesTempPos[yPos], 
-				vehicle.brakeTemp,
-				vehicle.prevBrakeTemp,
+				canListener.vehicle.brakeTemp,
+				canListener.vehicle.prevBrakeTemp,
 				charValue,
 				brakesTempDispLen,
 				3, 
@@ -303,14 +274,14 @@ void printValues() {
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
 	}
-	if (vehicle.prevRPM != vehicle.rpm) {
+	if (canListener.vehicle.prevRPM != canListener.vehicle.rpm) {
 		char charValue[rpmDispLen];
-		if (vehicle.rpm > MAX_RPM - 500) {
+		if (canListener.vehicle.rpm > MAX_RPM - 500) {
 			printInt(
 				rpmPos[xPos], 
 				rpmPos[yPos], 
-				vehicle.rpm,
-				vehicle.prevRPM,
+				canListener.vehicle.rpm,
+				canListener.vehicle.prevRPM,
 				charValue,
 				rpmDispLen,
 				3, 
@@ -321,8 +292,8 @@ void printValues() {
 			printInt(
 				rpmPos[xPos], 
 				rpmPos[yPos], 
-				vehicle.rpm,
-				vehicle.prevRPM,
+				canListener.vehicle.rpm,
+				canListener.vehicle.prevRPM,
 				charValue,
 				rpmDispLen,
 				3, 
@@ -330,10 +301,10 @@ void printValues() {
 			);
 		}
 	}
-	if (vehicle.prevSpeed != vehicle.speed) {
+	if (canListener.vehicle.prevSpeed != canListener.vehicle.speed) {
 		char charValue[speedDispLen];
-		if (vehicle.speed > vehicle.prevSpeed) {
-			for (int i = vehicle.prevSpeed; i < vehicle.speed; i++) {
+		if (canListener.vehicle.speed > canListener.vehicle.prevSpeed) {
+			for (int i = canListener.vehicle.prevSpeed; i < canListener.vehicle.speed; i++) {
 
 				uint8_t red;
 				uint8_t green;
@@ -353,7 +324,7 @@ void printValues() {
 			}
 		}
 		else {
-			for (int i = vehicle.prevSpeed; i >= vehicle.speed; i--) {
+			for (int i = canListener.vehicle.prevSpeed; i >= canListener.vehicle.speed; i--) {
 				drawSpeedLine(i, RA8875_BLACK);
 			}
 		}
@@ -361,23 +332,23 @@ void printValues() {
 		printInt(
 			speedPos[xPos], 
 			speedPos[yPos], 
-			vehicle.speed,
-			vehicle.prevSpeed,
+			canListener.vehicle.speed,
+			canListener.vehicle.prevSpeed,
 			charValue,
 			speedDispLen,
 			3, 
 			false
 		);
-		vehicle.prevSpeed = vehicle.speed;
+		canListener.vehicle.prevSpeed = canListener.vehicle.speed;
 	}
-	if (vehicle.prevGear != vehicle.gear) {
-		if (vehicle.gear == 0) {
+	if (canListener.vehicle.prevGear != canListener.vehicle.gear) {
+		if (canListener.vehicle.gear == 0) {
 			tft.drawChar(gearPos[xPos], gearPos[yPos], 'N', 0xffff, 0x0000, gearSize);
-			vehicle.prevGear = vehicle.gear;
+			canListener.vehicle.prevGear = canListener.vehicle.gear;
 		}
 		else {
-			char gearDisp = 48 + vehicle.gear;
-			vehicle.prevGear = vehicle.gear;
+			char gearDisp = 48 + canListener.vehicle.gear;
+			canListener.vehicle.prevGear = canListener.vehicle.gear;
 			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, gearSize);
 		}
 	}
@@ -402,7 +373,7 @@ void runShiftRegister() {
 	// Close the latch to write into register memory
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
-	ledBarSetBits = vehicle.rpm / RPM_SCALE;
+	ledBarSetBits = canListener.vehicle.rpm / RPM_SCALE;
 	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
