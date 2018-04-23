@@ -13,18 +13,6 @@ const uint8_t SR_DATA_OUT = 18;
 const uint8_t SR_LATCH = 19;
 const uint8_t SR_OUTPUT_ENABLE = 16;
 
-// Translate float values from CAN BUS
-inline float CANIntToFloat(uint16_t floatValue) {
-	return floatValue / 1000.0;
-}
-// Translate kelvin temperature values from CAN BUS
-inline float CANKelvinToFloat(uint16_t kelvinValue) {
-	float result = kelvinValue / 10.0;
-	result = result - 273.15;
-
-	return result;
-}
-
 // LCD positioning
 const uint16_t lcdWidth = 800;
 const uint16_t lcdHeight = 480;
@@ -35,17 +23,29 @@ const uint16_t gearSize = 20;
 const uint16_t gearPos[] = { ((lcdWidth - (5 * gearSize)) / 2), ((lcdHeight - (8 * gearSize)) / 2) };
 const uint16_t oilLabelPos[] = { 10, 15 };
 const uint16_t oilTempPos[] = { oilTempWidth + 30, 5 };
+const uint8_t oilTempDispLen = 4;
 const uint16_t waterLabelPos[] = { 10, 105 };
 const uint16_t waterTempPos[] = { waterTempWidth + 30, 100 };
+const uint8_t waterTempDispLen = 4;
 const uint16_t brakesLabelPos[] = { 10, 200 };
 const uint16_t brakesTempPos[] = { brakeTempWidth + 30, 190 };
+const uint8_t brakesTempDispLen = 4;
 const uint16_t batteryIconPos[] = { 10, 295, };
 const uint16_t voltagePos[] = { batteryWidth + 30, 285 };
-const uint16_t speedLabelPos[] = { 650, 240 };
-const uint16_t speedPos[] = { 510, 240 };
+const uint8_t voltageDispLen = 5;
+const uint16_t speedLabelPos[] = { 580, 240 };
+const uint16_t speedPos[] = { 590, 190 };
+const uint8_t speedDispLen = 3;
 const uint16_t rpmLabelPos[] = { 480, 380 };
 const uint16_t rpmPos[] = { 320, 380 };
+const uint8_t rpmDispLen = 5;
 const uint16_t fanIconPos[] = { (lcdWidth / 2) - (fanWidth / 2), 10 };
+
+// Circular speedometer vector
+int cX = 650;
+int cY = 250;
+uint16_t speedoOffsetRadius = 100;
+uint16_t speedoBarRadius = 30;
 
 // Shift register values
 const uint8_t WARNING_LIGHT1 = 128;
