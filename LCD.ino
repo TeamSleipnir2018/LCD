@@ -373,7 +373,20 @@ void runShiftRegister() {
 	// Close the latch to write into register memory
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
-	ledBarSetBits = canListener.vehicle.rpm / RPM_SCALE;
+	if (canListener.vehicle.rpm >= 3000) {
+		ledBarSetBits = 3;
+	}
+	else if (canListener.vehicle.rpm >= 2000) {
+		ledBarSetBits = 2;
+	}
+	else if (canListener.vehicle.rpm >= 1000) {
+		ledBarSetBits = 1;
+	}
+	else {
+		ledBarSetBits = canListener.vehicle.rpm / RPM_SCALE;
+	}
+	
+	// Set warning lights
 	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
