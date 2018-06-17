@@ -374,7 +374,7 @@ void runShiftRegister() {
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
 	ledBarSetBits = canListener.vehicle.rpm / RPM_SCALE;
-	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
+	uint8_t warning = warningSetBits | WARNING_LIGHT1 | WARNING_LIGHT2 | WARNING_LIGHT3 | WARNING_LIGHT4 | WARNING_LIGHT5 | WARNING_LIGHT6 | WARNING_LIGHT7 | WARNING_LIGHT8;
 	
 	// Shift bits to register
 	for (int i = 0; i < SR_WARNINGBITS; i++) {
