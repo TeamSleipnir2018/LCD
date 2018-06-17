@@ -373,8 +373,15 @@ void runShiftRegister() {
 	// Close the latch to write into register memory
 	digitalWrite(SR_LATCH, LOW);
 	// Scale RPM to number of LEDs
-	ledBarSetBits = canListener.vehicle.rpm / RPM_SCALE;
-	uint8_t warning = warningSetBits | WARNING_LIGHT1 | WARNING_LIGHT2 | WARNING_LIGHT3 | WARNING_LIGHT4 | WARNING_LIGHT5 | WARNING_LIGHT6 | WARNING_LIGHT7 | WARNING_LIGHT8;
+	if (canListener.vehicle.rpm < IDLE_RPM) {
+		ledBarSetBits = canListener.vehicle.rpm / 1000;
+	}
+	else {
+		ledBarSetBits = ((canListener.vehicle.rpm - IDLE_RPM) / RPM_SCALE) + 3;
+	}
+	
+	// Set warning lights
+	uint8_t warning = warningSetBits | WARNING_LIGHT2 | WARNING_LIGHT4 | WARNING_LIGHT6 | WARNING_LIGHT8;
 	
 	// Shift bits to register
 	for (int i = 0; i < SR_WARNINGBITS; i++) {
@@ -398,6 +405,74 @@ void runShiftRegister() {
 	}
 	// Open latch and enable register outputs
 	digitalWrite(SR_LATCH, HIGH);
+}
+
+uint16_t speedCount;
+bool reverse;
+
+void demo() {
+	if (reverse) {
+		if (canListener.vehicle.rpm != 0) {
+			canListener.vehicle.rpm -= 25;
+		}
+		else {
+			canListener.vehicle.oilTemp = random(4730, 4830);
+			canListener.vehicle.waterTemp = random(4030, 4230);
+			canListener.vehicle.brakeTemp = random(3730, 4230);
+			canListener.vehicle.voltage = random(11900, 12900);
+
+			if (canListener.vehicle.gear > 0) {
+				canListener.vehicle.gear--;
+				canListener.vehicle.rpm = 9000;
+			}
+			else {
+				canListener.vehicle.rpm = 0;
+				canListener.vehicle.speed = 0;
+			}
+		}
+	}
+	else {
+		if (canListener.vehicle.rpm != MAX_RPM) {
+			canListener.vehicle.rpm += 25;
+		}
+		else {
+			canListener.vehicle.oilTemp = random(4730, 4830);
+			canListener.vehicle.waterTemp = random(4030, 4230);
+			canListener.vehicle.brakeTemp = random(3730, 4230);
+			canListener.vehicle.voltage = random(11900, 12900);
+
+			if (canListener.vehicle.gear < 6) {
+				canListener.vehicle.gear++;
+				canListener.vehicle.rpm = 2000;
+			}
+			else {
+				canListener.vehicle.rpm = 13500;
+			}
+		}
+	}
+
+	if (reverse) {
+		if (canListener.vehicle.speed > 0) {
+			if (speedCount == 15) {
+				canListener.vehicle.speed--;
+				speedCount = 0;
+			}
+			else {
+				speedCount++;
+			}
+		}
+	}
+	else {
+		if (canListener.vehicle.speed < 200 && canListener.vehicle.gear != 0) {
+			if (speedCount == 15) {
+				canListener.vehicle.speed++;
+				speedCount = 0;
+			}
+			else {
+				speedCount++;
+			}
+		}
+	}
 }
 
 void setup() {
@@ -460,6 +535,7 @@ void setup() {
 
 void loop() {
 
+	demo();
 	printValues();
 	runShiftRegister();
 
