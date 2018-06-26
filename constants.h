@@ -58,10 +58,10 @@ const uint8_t WARNING_LIGHT7 = 2;
 const uint8_t WARNING_LIGHT8 = 1;
 const uint8_t SR_LEDBITS = 40;
 const uint8_t SR_WARNINGBITS = 8;
-const uint16_t RPM_SCALE = 270;
+const uint16_t RPM_SCALE = 214;
 const uint8_t TOTAL_LEDS = 48;
 
-const uint16_t MAX_RPM = 14000;
+const uint16_t MAX_RPM = 12000;
 const uint16_t IDLE_RPM = 4000;
 
 // Celcius symbol

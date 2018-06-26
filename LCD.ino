@@ -102,7 +102,7 @@ void printFrames() {
 	tft.drawFastHLine(280, 350, (800 - 280), RA8875_WHITE);
 	tft.drawFastHLine(0, oilTempPos[yPos] + oilTempHeight + 30, 280, RA8875_WHITE);
 	tft.drawFastHLine(0, waterTempPos[yPos] + waterTempHeight + 30, 280, RA8875_WHITE);
-	tft.drawFastHLine(0, brakesTempPos[yPos] + brakeTempHeight + 30, 280, RA8875_WHITE);
+	tft.drawFastHLine(0, ecuTempPos[yPos] + ecuTempHeight + 30, 280, RA8875_WHITE);
 	tft.drawFastHLine(0, voltagePos[yPos] + batteryHeight + 30, 280, RA8875_WHITE);
 }
 
@@ -244,29 +244,29 @@ void printValues() {
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
 	}
-	if (canListener.vehicle.prevBrakeTemp != canListener.vehicle.brakeTemp) {
-		char charValue[brakesTempDispLen];
-		if (canListener.vehicle.brakeTemp > 250) {
-			char charValue[brakesTempDispLen];
+	if (canListener.vehicle.prevEcuTemp != canListener.vehicle.ecuTemp) {
+		char charValue[ecuTempDispLen];
+		if (canListener.vehicle.ecuTemp > 250) {
+			char charValue[ecuTempDispLen];
 			printInt(
-				brakesTempPos[xPos], 
-				brakesTempPos[yPos], 
-				canListener.vehicle.brakeTemp,
-				canListener.vehicle.prevBrakeTemp,
+				ecuTempPos[xPos], 
+				ecuTempPos[yPos], 
+				canListener.vehicle.ecuTemp,
+				canListener.vehicle.prevEcuTemp,
 				charValue,
-				brakesTempDispLen,
+				ecuTempDispLen,
 				3, 
 				true
 			);
 		}
 		else {
 			printInt(
-				brakesTempPos[xPos], 
-				brakesTempPos[yPos], 
-				canListener.vehicle.brakeTemp,
-				canListener.vehicle.prevBrakeTemp,
+				ecuTempPos[xPos], 
+				ecuTempPos[yPos], 
+				canListener.vehicle.ecuTemp,
+				canListener.vehicle.prevEcuTemp,
 				charValue,
-				brakesTempDispLen,
+				ecuTempDispLen,
 				3, 
 				false
 			);
@@ -418,7 +418,7 @@ void demo() {
 		else {
 			canListener.vehicle.oilTemp = random(4730, 4830);
 			canListener.vehicle.waterTemp = random(4030, 4230);
-			canListener.vehicle.brakeTemp = random(3730, 4230);
+			canListener.vehicle.ecuTemp = random(2730, 3230);
 			canListener.vehicle.voltage = random(11900, 12900);
 
 			if (canListener.vehicle.gear > 0) {
@@ -438,7 +438,7 @@ void demo() {
 		else {
 			canListener.vehicle.oilTemp = random(4730, 4830);
 			canListener.vehicle.waterTemp = random(4030, 4230);
-			canListener.vehicle.brakeTemp = random(3730, 4230);
+			canListener.vehicle.ecuTemp = random(2730, 3230);
 			canListener.vehicle.voltage = random(11900, 12900);
 
 			if (canListener.vehicle.gear < 6) {
@@ -446,7 +446,7 @@ void demo() {
 				canListener.vehicle.rpm = 2000;
 			}
 			else {
-				canListener.vehicle.rpm = 13500;
+				canListener.vehicle.rpm = MAX_RPM - 500;
 			}
 		}
 	}
@@ -535,7 +535,7 @@ void setup() {
 
 void loop() {
 
-	demo();
+	//demo();
 	printValues();
 	runShiftRegister();
 
