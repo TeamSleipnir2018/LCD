@@ -13,8 +13,8 @@ public:
 	float waterTemp;
 	float prevWaterTemp;
 
-	uint16_t brakeTemp;
-	uint16_t prevBrakeTemp;
+	uint16_t ecuTemp;
+	uint16_t prevEcuTemp;
 
 	uint8_t gear;
 	uint8_t prevGear;

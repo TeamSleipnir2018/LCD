@@ -9,8 +9,8 @@
     <ClInclude Include="images\waterTempIcon.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="Vehicle.h" />
-    <ClInclude Include="__vm\.LCD.vsarduino.h" />
     <ClInclude Include="CanListener.h" />
+    <ClInclude Include="__vm\.LCD.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LCD.ino" />

@@ -17,7 +17,7 @@ Written by Einar Arnason
 #include <Adafruit_RA8875.h>
 #include "./images/logo.h"
 #include "./images/fanIcon.h"
-#include "./images/brakeTempIcon.h"
+#include "./images/ecuTempIcon.h"
 #include "./images/oilTempIcon.h"
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
@@ -75,13 +75,13 @@ void printIcons() {
 		waterTempHeight,
 		RA8875_WHITE
 	);
-	// Draw brake temperature icon
+	// Draw ECU temperature icon
 	tft.drawXBitmap(
-		brakesLabelPos[xPos],
-		brakesLabelPos[yPos],
-		brakeTempIcon,
-		brakeTempWidth,
-		brakeTempHeight,
+		ecuLabelPos[xPos],
+		ecuLabelPos[yPos],
+		ecuTempIcon,
+		ecuTempWidth,
+		ecuTempHeight,
 		RA8875_WHITE
 	);
 	tft.textMode();

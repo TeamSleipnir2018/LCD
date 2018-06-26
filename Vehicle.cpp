@@ -8,8 +8,8 @@ Vehicle::Vehicle() {
 	prevOilTemp = 1.0;
 	waterTemp = 0.0;
 	prevWaterTemp = 1.0;
-	brakeTemp = 0;
-	prevBrakeTemp = 1;
+	ecuTemp = 0;
+	prevEcuTemp = 1;
 	gear = 0;
 	prevGear = 1;
 	speed = 0;

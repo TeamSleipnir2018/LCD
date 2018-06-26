@@ -28,7 +28,8 @@
     "calpot",
     "lambda",
     "gear",
-    "oiltemp"
+    "oiltemp",
+    "oilpress"
   ],
   "rtgroups":{
     "analog":[
@@ -453,12 +454,12 @@
         {
           "name":"Spark cut rev limit",
           "id":"sparkrevlimit",
-          "value":16000.000000
+          "value":14000.000000
         },
         {
           "name":"Fuel cut rev limit",
           "id":"fuelrevlimit",
-          "value":14000.000000
+          "value":12000.000000
         },
         {
           "name":"Fuel rev limit hysteresis",
@@ -11958,7 +11959,7 @@
               "name":"Output 1 function",
               "type":3,
               "id":"output.0",
-              "value":"Tach output"
+              "value":"Fan relay"
             },
             {
               "name":"Output 2 function",
@@ -12145,7 +12146,7 @@
         {
           "name":"Fan turn-on temperature",
           "id":"fantemperature",
-          "value":90.000000
+          "value":80.000000
         },
         {
           "name":"Fan turn-off hysteresis",
@@ -18394,14 +18395,14 @@
                 "const_zero",
                 "const_zero",
                 "const_zero",
-                "const_zero",
+                "oilpress",
                 "const_zero",
                 "const_zero",
                 "const_zero",
                 "oiltemp",
                 "gear",
                 "airtemp",
-                "injangle1",
+                "ecutemp",
                 "enginespeed",
                 "supplyvoltage",
                 "coolanttemp",
@@ -18452,7 +18453,7 @@
                 0.000000,
                 0.000000,
                 0.000000,
-                0.000000,
+                3.000000,
                 2.000000,
                 1.000000
               ]
