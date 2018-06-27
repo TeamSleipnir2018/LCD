@@ -28,7 +28,6 @@ Written by Einar Arnason
 
 // LCD driver
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
-//uint16_t tx, ty;
 
 // CAN BUS driver
 CanListener canListener;
@@ -380,7 +379,7 @@ void printValues() {
 	if (canListener.vehicle.prevFanOn != canListener.vehicle.fanOn) {
 		tft.graphicsMode();
 		if (canListener.vehicle.fanOn) {
-			tft.fillRect(fanIconPos[xPos] - 15, fanIconPos[yPos] - 15, 100, 100, RA8875_BLACK);
+			tft.fillRect(disabledIconPos[xPos], disabledIconPos[yPos], 100, 100, RA8875_BLACK);
 			tft.drawXBitmap(
 				fanIconPos[xPos],
 				fanIconPos[yPos],
@@ -391,22 +390,18 @@ void printValues() {
 			);
 		}
 		else {
-			drawFanDisabled();
+			tft.drawXBitmap(
+				disabledIconPos[xPos],
+				disabledIconPos[yPos],
+				disabledIcon,
+				disabledWidth,
+				disabledHeight,
+				RA8875_RED
+			);
 		}
 		canListener.vehicle.prevFanOn = canListener.vehicle.fanOn;
 	}
 	tft.textMode();
-}
-
-void drawFanDisabled() {
-	tft.drawXBitmap(
-		fanIconPos[xPos] - 15,
-		fanIconPos[yPos] - 15,
-		disabledIcon,
-		disabledWidth,
-		disabledHeight,
-		RA8875_RED
-	);
 }
 
 // Draws the line in a circular speedometer
@@ -526,13 +521,31 @@ void demo() {
 }
 
 void setup() {
+	// Initialize serial console
 	Serial.begin(9600);
+	
+	// Initialise the display
 	Serial.println("RA8875 start");
+	while (!tft.begin(RA8875_800x480)) {
+		Serial.println("RA8875 Not Found!");
+		delay(1000);
+	}
+	digitalWrite(RA8875_CS, LOW);
+	Serial.println("Found RA8875");
 
-	// Initialize the CAN bus
-	Can0.begin(500000);
-	Can0.attachObj(&canListener);
-	canListener.attachGeneralHandler();
+	tft.displayOn(true);
+	tft.GPIOX(true);      // Enable TFT - display enable tied to GPIOX
+	tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
+	tft.PWM1out(0); // Start faded out
+	
+	//Draw logo and Fade in
+	tft.graphicsMode();
+	tft.fillScreen(RA8875_BLACK);
+	tft.drawXBitmap(logoPos[xPos], logoPos[yPos], logo, logoWidth, logoHeight, RA8875_RED);
+	for (uint8_t i = 0; i != 255; i += 5) {
+		tft.PWM1out(i);
+		delay(10);
+	}
 
 	// Enable shiftregister output
 	pinMode(SR_CLOCK_OUT, OUTPUT);
@@ -542,36 +555,13 @@ void setup() {
 	digitalWrite(SR_OUTPUT_ENABLE, HIGH);
 	warningSetBits = 0;
 
-	// Initialise the display using 'RA8875_480x272'
-	while (!tft.begin(RA8875_800x480)) {
-		Serial.println("RA8875 Not Found!");
-		delay(1000);
-	}
-	digitalWrite(RA8875_CS, LOW);
+	// Initialize the CAN bus
+	Can0.begin(500000);
+	Can0.attachObj(&canListener);
+	canListener.attachGeneralHandler();
 
-	Serial.println("Found RA8875");
-
-	tft.displayOn(true);
-	tft.GPIOX(true);      // Enable TFT - display enable tied to GPIOX
-	tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
-	tft.PWM1out(0); // Start faded out
-	
-	//Draw logo
-	tft.graphicsMode();
-	tft.fillScreen(RA8875_BLACK);
-	tft.drawXBitmap(logoPos[xPos], logoPos[yPos], logo, logoWidth, logoHeight, RA8875_RED);
-	
-	// Fade in and wait 2s
-	for (uint8_t i = 0; i != 255; i += 5) {
-		tft.PWM1out(i);
-		delay(10);
-	}
-	delay(2000);
-
-	// Enable touch function
-	pinMode(RA8875_INT, INPUT);
-	digitalWrite(RA8875_INT, HIGH);
-	tft.touchEnable(true);
+	// Let the logo linger a bit
+	delay(1800);
 	
 	// Clear sceen
 	tft.fillScreen(RA8875_BLACK);
@@ -588,35 +578,4 @@ void loop() {
 	//demo();
 	printValues();
 	runShiftRegister();
-
-	/*
-	float xScale = 1024.0F / tft.width();
-	float yScale = 1024.0F / tft.height();
-	
-	// Wait around for touch events
-	if (digitalRead(RA8875_INT)) {
-		if (tft.touched()) {
-			tft.touchRead(&tx, &ty);
-			uint16_t touchX = (uint16_t)(tx / xScale);
-			uint16_t touchY = (uint16_t)(ty / yScale);
-
-			if (touchX >= 220 && touchX <= 255 && touchY >= 0 && touchY <= 40) {
-				if (prevFanOn != fanOn) {
-					prevFanOn = fanOn;
-					if (fanOn) {
-						drawFanDisabled();
-						fanOn = false;
-					}
-					else {
-						tft.graphicsMode();
-						tft.fillRect(215, 0, 50, 50, 0x0000);
-						tft.drawXBitmap(225, 10, fanIcon, fanWidth, fanHeight, 0xffff);
-						tft.textMode();
-						fanOn = true;
-					}
-				}
-			}
-		}
-	}
-	*/
 }

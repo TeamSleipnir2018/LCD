@@ -43,6 +43,7 @@ const uint16_t fanIconPos[] = { (lcdWidth / 2) - (fanWidth / 2), 10 };
 const uint16_t fuelPressurePos[] = { fuelPressureWidth + 30, 380 };
 const uint8_t fuelPressureDispLen = 4;
 const uint16_t fuelPressureIconPos[] = { 10, 380, };
+const uint16_t disabledIconPos[] = { (uint16_t)(fanIconPos[xPos] - 15), (uint16_t)(fanIconPos[yPos] - 15) };
 
 // Circular speedometer vector
 int cX = 650;
