@@ -30,10 +30,7 @@
     "gear",
     "oiltemp",
     "oilpress",
-    "fuelflow",
-    "analog4",
-    "fuel_alsmod",
-    "outputs"
+    "fuelflow"
   ],
   "rtgroups":{
     "analog":[
@@ -2213,7 +2210,7 @@
                   "xaxis":"fpvoltages",
                   "value":[
                     0.000000,
-                    6895.000000
+                    10000.000000
                   ]
                 },
                 {
@@ -18400,13 +18397,13 @@
                 "const_zero",
                 "const_zero",
                 "ecutemp",
-                "fp_abs",
-                "const_zero",
-                "const_zero",
+                "fuelmass",
+                "fuelflow",
+                "maf",
                 "oiltemp",
                 "gear",
                 "airtemp",
-                "map",
+                "oilpress",
                 "enginespeed",
                 "supplyvoltage",
                 "coolanttemp",
@@ -18489,9 +18486,9 @@
                 "Disabled",
                 "Disabled",
                 "Disabled",
-                "5Hz",
-                "5Hz",
-                "5Hz"
+                "Disabled",
+                "100Hz",
+                "10Hz"
               ]
             }
           ]
@@ -18509,7 +18506,7 @@
               ],
               "id":"customcanenable",
               "type":3,
-              "value":"Enabled"
+              "value":"Disabled"
             },
             {
               "name":"Transmission frequency",
@@ -18540,7 +18537,7 @@
                 "Disabled",
                 "Disabled",
                 "Disabled",
-                "25Hz"
+                "Disabled"
               ]
             },
             {
@@ -18581,6 +18578,7 @@
                 0.000000,
                 0.000000,
                 0.000000,
+                4294967295.000000,
                 0.000000,
                 0.000000,
                 0.000000,
@@ -18588,8 +18586,7 @@
                 0.000000,
                 0.000000,
                 0.000000,
-                0.000000,
-                4.000000
+                0.000000
               ]
             },
             {
@@ -18621,7 +18618,7 @@
                 0.000000,
                 0.000000,
                 0.000000,
-                1.000000
+                0.000000
               ]
             },
             {
@@ -18704,7 +18701,7 @@
                 "const_zero",
                 "const_zero",
                 "const_zero",
-                "outputs",
+                "const_zero",
                 "const_zero",
                 "const_zero",
                 "const_zero"
@@ -18790,7 +18787,7 @@
                 "bit",
                 "bit",
                 "bit",
-                "u32be",
+                "bit",
                 "bit",
                 "bit",
                 "bit"
@@ -19009,6 +19006,7 @@
                 0.000000,
                 0.000000,
                 0.000000,
+                -16775216.000000,
                 0.000000,
                 0.000000,
                 0.000000,
@@ -19098,7 +19096,6 @@
                 0.000000,
                 0.000000,
                 0.000000,
-                1.000000,
                 0.000000,
                 0.000000,
                 0.000000,

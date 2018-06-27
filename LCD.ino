@@ -21,6 +21,8 @@ Written by Einar Arnason
 #include "./images/oilTempIcon.h"
 #include "./images/waterTempIcon.h"
 #include "./images/batteryIcon.h"
+#include "./images/fuelPressureIcon.h"
+#include "./images/disabledIcon.h"
 #include "constants.h"
 #include "CanListener.h"
 
@@ -82,6 +84,15 @@ void printIcons() {
 		ecuTempIcon,
 		ecuTempWidth,
 		ecuTempHeight,
+		RA8875_WHITE
+	);
+	// Draw fuel pressure icon
+	tft.drawXBitmap(
+		fuelPressureIconPos[xPos],
+		fuelPressureIconPos[yPos],
+		fuelPressureIcon,
+		fuelPressureWidth,
+		fuelPressureHeight,
 		RA8875_WHITE
 	);
 	tft.textMode();
@@ -188,7 +199,7 @@ void printValues() {
 	}
 	if (canListener.vehicle.prevOilTemp != canListener.vehicle.oilTemp) {
 		char charValue[oilTempDispLen];
-		if (canListener.vehicle.oilTemp > 250) {
+		if (canListener.vehicle.oilTemp > 130) {
 			printFloatNoPoint(
 				oilTempPos[xPos], 
 				oilTempPos[yPos], 
@@ -217,7 +228,7 @@ void printValues() {
 	}
 	if (canListener.vehicle.prevWaterTemp != canListener.vehicle.waterTemp) {
 		char charValue[waterTempDispLen];
-		if (canListener.vehicle.waterTemp > 250) {
+		if (canListener.vehicle.waterTemp > 98) {
 			printFloatNoPoint(
 				waterTempPos[xPos], 
 				waterTempPos[yPos], 
@@ -246,9 +257,9 @@ void printValues() {
 	}
 	if (canListener.vehicle.prevEcuTemp != canListener.vehicle.ecuTemp) {
 		char charValue[ecuTempDispLen];
-		if (canListener.vehicle.ecuTemp > 250) {
+		if (canListener.vehicle.ecuTemp > 80) {
 			char charValue[ecuTempDispLen];
-			printInt(
+			printFloatNoPoint(
 				ecuTempPos[xPos], 
 				ecuTempPos[yPos], 
 				canListener.vehicle.ecuTemp,
@@ -260,7 +271,7 @@ void printValues() {
 			);
 		}
 		else {
-			printInt(
+			printFloatNoPoint(
 				ecuTempPos[xPos], 
 				ecuTempPos[yPos], 
 				canListener.vehicle.ecuTemp,
@@ -273,6 +284,20 @@ void printValues() {
 		}
 		tft.textEnlarge(2);
 		tft.textWrite(celcius);
+	}
+	if (canListener.vehicle.prevFuelPressure != canListener.vehicle.fuelPressure) {
+		char charValue[fuelPressureDispLen];
+		printInt(
+			fuelPressurePos[xPos],
+			fuelPressurePos[yPos],
+			canListener.vehicle.fuelPressure,
+			canListener.vehicle.prevFuelPressure,
+			charValue,
+			fuelPressureDispLen,
+			3,
+			false
+		);
+		tft.textWrite("mB");
 	}
 	if (canListener.vehicle.prevRPM != canListener.vehicle.rpm) {
 		char charValue[rpmDispLen];
@@ -352,11 +377,36 @@ void printValues() {
 			tft.drawChar(gearPos[xPos], gearPos[yPos], gearDisp, 0xffff, 0x0000, gearSize);
 		}
 	}
+	if (canListener.vehicle.prevFanOn != canListener.vehicle.fanOn) {
+		tft.graphicsMode();
+		if (canListener.vehicle.fanOn) {
+			tft.fillRect(fanIconPos[xPos] - 15, fanIconPos[yPos] - 15, 100, 100, RA8875_BLACK);
+			tft.drawXBitmap(
+				fanIconPos[xPos],
+				fanIconPos[yPos],
+				fanIcon,
+				fanWidth,
+				fanHeight,
+				RA8875_WHITE
+			);
+		}
+		else {
+			drawFanDisabled();
+		}
+		canListener.vehicle.prevFanOn = canListener.vehicle.fanOn;
+	}
+	tft.textMode();
 }
 
 void drawFanDisabled() {
-	tft.drawCircle(238, 23, 20, RA8875_RED);
-	tft.drawLine(225, 10, 251, 36, RA8875_RED);
+	tft.drawXBitmap(
+		fanIconPos[xPos] - 15,
+		fanIconPos[yPos] - 15,
+		disabledIcon,
+		disabledWidth,
+		disabledHeight,
+		RA8875_RED
+	);
 }
 
 // Draws the line in a circular speedometer

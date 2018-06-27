@@ -13,8 +13,8 @@ public:
 	float waterTemp;
 	float prevWaterTemp;
 
-	uint16_t ecuTemp;
-	uint16_t prevEcuTemp;
+	float ecuTemp;
+	float prevEcuTemp;
 
 	uint8_t gear;
 	uint8_t prevGear;
@@ -27,6 +27,9 @@ public:
 
 	bool fanOn;
 	bool prevFanOn;
+
+	uint16_t fuelPressure;
+	uint16_t prevFuelPressure;
 
 	Vehicle();
 	virtual ~Vehicle();

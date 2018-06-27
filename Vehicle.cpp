@@ -8,8 +8,8 @@ Vehicle::Vehicle() {
 	prevOilTemp = 1.0;
 	waterTemp = 0.0;
 	prevWaterTemp = 1.0;
-	ecuTemp = 0;
-	prevEcuTemp = 1;
+	ecuTemp = 0.0;
+	prevEcuTemp = 1.0;
 	gear = 0;
 	prevGear = 1;
 	speed = 0;
@@ -18,6 +18,8 @@ Vehicle::Vehicle() {
 	prevFanOn = true;
 	voltage = 0.0;
 	prevVoltage = 1.0;
+	fuelPressure = 0;
+	prevFuelPressure = 1;
 }
 
 
